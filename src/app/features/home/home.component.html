@@ -1,0 +1,27 @@
+<div class="container">
+  <h1>Jutjubić - Lista korisnika</h1>
+
+  <div *ngIf="loading">Učitavanje...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="!loading && users.length === 0">
+    <p>Nema korisnika u bazi.</p>
+  </div>
+
+  <table *ngIf="!loading && users.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Username</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.id }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.username }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
