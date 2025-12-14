@@ -1,0 +1,47 @@
+<div class="activate-container">
+  <div class="activate-card">
+    <!-- Loading State -->
+    <div class="content" *ngIf="loading">
+      <div class="spinner-large">
+        <svg viewBox="0 0 24 24">
+          <circle class="spinner-circle" cx="12" cy="12" r="10"></circle>
+        </svg>
+      </div>
+      <h1>Aktivacija u toku...</h1>
+      <p>Molimo sačekajte dok aktiviramo vaš nalog.</p>
+    </div>
+
+    <!-- Success State -->
+    <div class="content success-content" *ngIf="!loading && success">
+      <div class="icon-wrapper success">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <h1>Nalog uspešno aktiviran! 🎉</h1>
+      <p>Vaš nalog je aktiviran. Sada se možete prijaviti na Jutjubić platformu.</p>
+      <button class="btn-primary" (click)="goToLogin()">
+        Prijavi se
+      </button>
+    </div>
+
+    <!-- Error State -->
+    <div class="content error-content" *ngIf="!loading && !success">
+      <div class="icon-wrapper error">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <h1>Aktivacija neuspešna</h1>
+      <p class="error-message">{{ errorMessage }}</p>
+      <div class="error-actions">
+        <button class="btn-secondary" routerLink="/register">
+          Registruj se ponovo
+        </button>
+        <button class="btn-primary" routerLink="/login">
+          Idi na prijavu
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,38 +1,50 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { UserService } from '../../core/services/user.service';
-import { User } from '../../core/models/user.model';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HomeComponent } from './home.component';
+import { AuthService } from '../../core/services/auth.service';
+import { Router } from '@angular/router';
 
-@Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
-})
-export class HomeComponent implements OnInit {
-  users: User[] = [];
-  loading = false;
-  error = '';
+describe('HomeComponent', () => {
+  let component: HomeComponent;
+  let fixture: ComponentFixture<HomeComponent>;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let routerSpy: jasmine.SpyObj<Router>;
 
-  constructor(private userService: UserService) {}
+  beforeEach(() => {
+    const authSpy = jasmine.createSpyObj('AuthService', ['getToken', 'logout']);
+    const routerSpyObj = jasmine.createSpyObj('Router', ['navigate']);
 
-  ngOnInit(): void {
-    this.loadUsers();
-  }
-
-  loadUsers(): void {
-    this.loading = true;
-    this.userService.getAllUsers().subscribe({
-      next: (data) => {
-        this.users = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Greška pri ucitavanju korisnika';
-        this.loading = false;
-        console.error(err);
-      }
+    TestBed.configureTestingModule({
+      declarations: [HomeComponent],
+      providers: [
+        { provide: AuthService, useValue: authSpy },
+        { provide: Router, useValue: routerSpyObj }
+      ]
     });
-  }
-}
+
+    fixture = TestBed.createComponent(HomeComponent);
+    component = fixture.componentInstance;
+    authServiceSpy = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should load user email from token on init', () => {
+    const mockToken = 'header.' + btoa(JSON.stringify({ sub: 'test@example.com' })) + '.signature';
+    authServiceSpy.getToken.and.returnValue(mockToken);
+
+    component.ngOnInit();
+
+    expect(component.userEmail).toBe('test@example.com');
+  });
+
+  it('should call logout on AuthService when logout is confirmed', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+
+    component.logout();
+
+    expect(authServiceSpy.logout).toHaveBeenCalled();
+  });
+});

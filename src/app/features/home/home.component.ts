@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../../core/services/user.service';
-import { User } from '../../core/models/user.model';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -8,28 +8,30 @@ import { User } from '../../core/models/user.model';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  users: User[] = [];
-  loading = false;
-  error = '';
+  userEmail: string = '';
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.loadUsers();
+    // Preuzmi email iz tokena (možeš dekodirati JWT)
+    const token = this.authService.getToken();
+    if (token) {
+      // Jednostavno dekodiranje JWT-a (samo za prikaz, ne validaciju!)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.userEmail = payload.sub || '';
+      } catch (e) {
+        console.error('Error parsing token', e);
+      }
+    }
   }
 
-  loadUsers(): void {
-    this.loading = true;
-    this.userService.getAllUsers().subscribe({
-      next: (data) => {
-        this.users = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Greška pri učitavanju korisnika';
-        this.loading = false;
-        console.error(err);
-      }
-    });
+  logout(): void {
+    if (confirm('Da li ste sigurni da želite da se odjavite?')) {
+      this.authService.logout();
+    }
   }
 }

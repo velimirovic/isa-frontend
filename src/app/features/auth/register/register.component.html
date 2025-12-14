@@ -1,0 +1,142 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="header">
+      <h1>Dobrodošli na Jutjubić</h1>
+      <p>Kreirajte svoj nalog</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <!-- Success Message -->
+      <div class="alert alert-success" *ngIf="successMessage">
+        <svg class="icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        {{ successMessage }}
+      </div>
+
+      <!-- Error Message -->
+      <div class="alert alert-error" *ngIf="errorMessage">
+        <svg class="icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        {{ errorMessage }}
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">Ime *</label>
+          <input 
+            type="text" 
+            id="firstName" 
+            formControlName="firstName"
+            [class.error]="hasError('firstName', 'required')"
+            placeholder="Unesite ime"
+          />
+          <span class="error-text" *ngIf="getErrorMessage('firstName')">
+            {{ getErrorMessage('firstName') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Prezime *</label>
+          <input 
+            type="text" 
+            id="lastName" 
+            formControlName="lastName"
+            [class.error]="hasError('lastName', 'required')"
+            placeholder="Unesite prezime"
+          />
+          <span class="error-text" *ngIf="getErrorMessage('lastName')">
+            {{ getErrorMessage('lastName') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          [class.error]="hasError('email', 'required') || hasError('email', 'email')"
+          placeholder="primer@email.com"
+        />
+        <span class="error-text" *ngIf="getErrorMessage('email')">
+          {{ getErrorMessage('email') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="username">Korisničko ime *</label>
+        <input 
+          type="text" 
+          id="username" 
+          formControlName="username"
+          [class.error]="hasError('username', 'required') || hasError('username', 'minlength')"
+          placeholder="Minimalno 3 karaktera"
+        />
+        <span class="error-text" *ngIf="getErrorMessage('username')">
+          {{ getErrorMessage('username') }}
+        </span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Lozinka *</label>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password"
+            [class.error]="hasError('password', 'required') || hasError('password', 'minlength')"
+            placeholder="Minimalno 6 karaktera"
+          />
+          <span class="error-text" *ngIf="getErrorMessage('password')">
+            {{ getErrorMessage('password') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Potvrda lozinke *</label>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            formControlName="confirmPassword"
+            [class.error]="passwordMismatch"
+            placeholder="Ponovite lozinku"
+          />
+          <span class="error-text" *ngIf="passwordMismatch">
+            Lozinke se ne poklapaju
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Adresa</label>
+        <input 
+          type="text" 
+          id="address" 
+          formControlName="address"
+          placeholder="Grad, Država (opciono)"
+        />
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn-primary" 
+        [disabled]="loading"
+      >
+        <span *ngIf="!loading">Registruj se</span>
+        <span *ngIf="loading" class="loading-spinner">
+          <svg class="spinner" viewBox="0 0 24 24">
+            <circle class="spinner-circle" cx="12" cy="12" r="10"></circle>
+          </svg>
+          Registracija u toku...
+        </span>
+      </button>
+    </form>
+
+    <div class="footer">
+      <p>Već imate nalog? <a routerLink="/login">Prijavite se</a></p>
+    </div>
+  </div>
+</div>
