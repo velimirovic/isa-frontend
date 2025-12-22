@@ -38,25 +38,49 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
         this.loading = false;
-        this.router.navigate(['/home']);
+        this.router.navigate(['/']);
       },
       error: (error) => {
         this.loading = false;
         
-        // Izvuci broj preostalih pokušaja iz poruke
-        const errorText = error.error || error.message || 'Došlo je do greške pri prijavljivanju.';
-        this.errorMessage = errorText;
+        // Parse error message from backend
+        const errorText = typeof error.error === 'string' ? error.error : 
+                         (error.error?.message || error.message || '');
         
-        const match = errorText.match(/Preostalo pokušaja:\s*(\d+)/);
-        if (match) {
-          this.remainingAttempts = parseInt(match[1], 10);
+        // Extract remaining attempts from error message
+        const attemptsMatch = errorText.match(/Preostalo pokušaja:\s*(\d+)/i);
+        if (attemptsMatch) {
+          this.remainingAttempts = parseInt(attemptsMatch[1], 10);
         }
 
-        // Specifične poruke za različite greške
-        if (error.status === 429) {
-          this.errorMessage = 'Previše pokušaja prijavljivanja. Pokušajte ponovo za 1 minut.';
+        // Handle specific error cases
+        if (error.status === 401) {
+          if (errorText?.includes('Pogrešan email') || 
+              errorText?.includes('Incorrect email') ||
+              errorText?.includes('Bad credentials')) {
+            this.errorMessage = 'Pogrešan email ili lozinka. Molimo pokušajte ponovo.';
+          } else if (errorText?.includes('Nalog nije aktiviran') || 
+                     errorText?.includes('Account not activated')) {
+            this.errorMessage = 'Nalog nije aktiviran. Proverite email za aktivacioni link.';
+          } else {
+            this.errorMessage = errorText || 'Neispravni pristupni podaci.';
+          }
         } else if (error.status === 403) {
-          this.errorMessage = 'Morate aktivirati nalog pre prijavljivanja. Proverite email.';
+          this.errorMessage = 'Pristup odbijen. Morate aktivirati nalog pre prijavljivanja.';
+        } else if (error.status === 429) {
+          this.errorMessage = 'Previše pokušaja prijavljivanja. Nalog je privremeno zaključan. Pokušajte ponovo kasnije.';
+          this.remainingAttempts = 0;
+        } else if (error.status === 423) {
+          this.errorMessage = 'Nalog je zaključan zbog previše neuspešnih pokušaja. Pokušajte ponovo za 1 minut.';
+          this.remainingAttempts = 0;
+        } else if (error.status === 400) {
+          this.errorMessage = 'Neispravni podaci. Proverite email i lozinku.';
+        } else if (error.status === 500) {
+          this.errorMessage = 'Serverska greška. Molimo pokušajte kasnije.';
+        } else if (error.status === 0) {
+          this.errorMessage = 'Nema konekcije sa serverom. Proverite internet konekciju.';
+        } else {
+          this.errorMessage = errorText || 'Došlo je do neočekivane greške pri prijavljivanju.';
         }
       }
     });

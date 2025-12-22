@@ -8,13 +8,13 @@ import { CheckEmailComponent } from './features/auth/check-email/check-email.com
 import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'activate', component: ActivateComponent },
   { path: 'check-email', component: CheckEmailComponent },
-  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: '/login' }
+  { path: 'home', redirectTo: '', pathMatch: 'full' },
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

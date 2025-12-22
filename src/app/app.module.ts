@@ -11,6 +11,7 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { ActivateComponent } from './features/auth/activate/activate.component';
 import { CheckEmailComponent } from './features/auth/check-email/check-email.component';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { NavbarComponent } from './shared/navbar/navbar.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
     RegisterComponent,
     LoginComponent,
     ActivateComponent,
-    CheckEmailComponent
+    CheckEmailComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,

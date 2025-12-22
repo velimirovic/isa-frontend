@@ -1,7 +1,22 @@
 <div class="register-container">
   <div class="register-card">
+    <!-- Home Link -->
+    <a class="home-link" routerLink="/">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+      Home
+    </a>
+
+    <!-- Header -->
     <div class="header">
-      <h1>Dobrodošli na Jutjubić</h1>
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/>
+          <path d="M10 12l5-3-5-3z"/>
+        </svg>
+      </div>
+      <h1>JUTJUBIC</h1>
       <p>Kreirajte svoj nalog</p>
     </div>
 
@@ -53,7 +68,7 @@
       </div>
 
       <div class="form-group">
-        <label for="email">Email *</label>
+        <label for="email">Email adresa *</label>
         <input 
           type="email" 
           id="email" 
@@ -135,8 +150,7 @@
       </button>
     </form>
 
+    <!-- Footer -->
     <div class="footer">
-      <p>Već imate nalog? <a routerLink="/login">Prijavite se</a></p>
-    </div>
-  </div>
+      <p>Već imate nalog? <a routerLink="/login" class="link">Prijavite se</a></p>
 </div>
