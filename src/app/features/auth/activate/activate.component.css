@@ -3,14 +3,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3cd9a7 0%, #2ab88a 100%);
   padding: 20px;
 }
 
 .activate-card {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 500px;
   padding: 48px 40px;
@@ -36,7 +36,7 @@
 
 .spinner-circle {
   fill: none;
-  stroke: #667eea;
+  stroke: #3cd9a7;
   stroke-width: 3;
   stroke-linecap: round;
   stroke-dasharray: 50;
@@ -100,29 +100,30 @@ p {
 
 .btn-primary {
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 16px;
+  background: linear-gradient(135deg, #3cd9a7 0%, #2ab88a 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(60, 217, 167, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 10px 30px rgba(60, 217, 167, 0.4);
 }
 
 .btn-secondary {
   width: 100%;
   padding: 14px;
   background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
-  border-radius: 8px;
+  color: #3cd9a7;
+  border: 2px solid #3cd9a7;
+  border-radius: 10px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -131,7 +132,7 @@ p {
 }
 
 .btn-secondary:hover {
-  background: #f7fafc;
+  background: #f0fdf9;
   transform: translateY(-2px);
 }
 

@@ -1,5 +1,14 @@
 <div class="login-container">
   <div class="login-card">
+    <!-- Home Link -->
+    <a class="home-link" routerLink="/">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+      Home
+    </a>
+
+    <!-- Logo and Header -->
     <div class="header">
       <div class="logo">
         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -7,31 +16,32 @@
           <path d="M10 12l5-3-5-3z"/>
         </svg>
       </div>
-      <h1>Dobrodošli nazad</h1>
-      <p>Prijavite se na svoj Jutjubić nalog</p>
+      <h1>JUTJUBIC</h1>
+      <p>Prijavite se na vaš nalog</p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <!-- Error Message -->
-      <div class="alert alert-error" *ngIf="errorMessage">
-        <svg class="icon" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-        </svg>
-        <div>
-          <div>{{ errorMessage }}</div>
-          <div class="attempts-info" *ngIf="remainingAttempts !== null">
-            <span *ngIf="remainingAttempts > 0" class="attempts-warning">
-              ⚠️ Preostalo pokušaja: {{ remainingAttempts }}
-            </span>
-            <span *ngIf="remainingAttempts === 0" class="attempts-blocked">
-              🔒 Nalog je privremeno zaključan
-            </span>
-          </div>
+    <!-- Error Message -->
+    <div class="alert alert-error" *ngIf="errorMessage">
+      <svg class="icon" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+      </svg>
+      <div>
+        <div>{{ errorMessage }}</div>
+        <div class="attempts-info" *ngIf="remainingAttempts !== null">
+          <span *ngIf="remainingAttempts > 0" class="attempts-warning">
+            ⚠️ Preostalo pokušaja: {{ remainingAttempts }}
+          </span>
+          <span *ngIf="remainingAttempts === 0" class="attempts-blocked">
+            🔒 Nalog je privremeno zaključan
+          </span>
         </div>
       </div>
+    </div>
 
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">Email adresa</label>
         <div class="input-wrapper">
           <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
@@ -84,8 +94,7 @@
       </button>
     </form>
 
+    <!-- Footer -->
     <div class="footer">
-      <p>Nemate nalog? <a routerLink="/register">Registrujte se</a></p>
-    </div>
-  </div>
+      <p>Nemate nalog? <a routerLink="/register" class="link">Registrujte se</a></p>
 </div>

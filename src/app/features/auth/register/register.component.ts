@@ -56,7 +56,51 @@ export class RegisterComponent {
       },
       error: (error) => {
         this.loading = false;
-        this.errorMessage = error.error || 'Došlo je do greške pri registraciji.';
+        
+        // Parse error message from backend
+        let errorText = '';
+        
+        if (typeof error.error === 'string') {
+          errorText = error.error;
+        } else if (error.error?.message) {
+          errorText = error.error.message;
+        } else if (error.message) {
+          errorText = error.message;
+        }
+        
+        // Handle specific error cases based on status code first
+        if (error.status === 401) {
+          // 401 usually means duplicate username or email
+          this.errorMessage = 'Korisničko ime ili email već postoji. Molimo izaberite drugo.';
+        } else if (error.status === 400) {
+          this.errorMessage = 'Neispravni podaci. Molimo proverite sve unose i pokušajte ponovo.';
+        } else if (error.status === 500) {
+          this.errorMessage = 'Serverska greška. Molimo pokušajte kasnije.';
+        } else if (error.status === 0) {
+          this.errorMessage = 'Nema konekcije sa serverom. Proverite internet konekciju.';
+        } else if (errorText) {
+          // Try to parse specific error messages from text
+          if (errorText.includes('Korisnicko ime vec postoji') || 
+              errorText.includes('Username already exists')) {
+            this.errorMessage = 'Korisničko ime već postoji. Molimo izaberite drugo korisničko ime.';
+          } else if (errorText.includes('Email vec postoji') || 
+                     errorText.includes('Email already exists')) {
+            this.errorMessage = 'Email adresa je već registrovana. Molimo koristite drugu email adresu.';
+          } else if (errorText.includes('Lozinke se ne poklapaju') || 
+                     errorText.includes('Passwords do not match')) {
+            this.errorMessage = 'Lozinke se ne poklapaju.';
+          } else if (errorText.includes('Nevalidna email adresa') || 
+                     errorText.includes('Invalid email')) {
+            this.errorMessage = 'Email adresa nije validna.';
+          } else if (errorText.includes('Lozinka mora biti najmanje') || 
+                     errorText.includes('Password must be at least')) {
+            this.errorMessage = 'Lozinka mora imati najmanje 6 karaktera.';
+          } else {
+            this.errorMessage = 'Došlo je do greške pri registraciji. Molimo pokušajte ponovo.';
+          }
+        } else {
+          this.errorMessage = 'Došlo je do neočekivane greške. Molimo pokušajte ponovo.';
+        }
       }
     });
   }
