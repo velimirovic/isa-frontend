@@ -45,7 +45,7 @@
             </div>
 
             <div>
-                <label for="title">Title:</label>
+                <label for="title">Naslov:</label>
                 <input type="text" id="title" name="title" formControlName="title" maxlength="100" />
                 <div class="error-message" *ngIf="title?.touched && title?.invalid">
                     <span *ngIf="title?.errors?.['required']">Naslov je obavezan.</span>
@@ -53,14 +53,14 @@
                 </div>
             </div>
             <div>
-                <label for="description">Description:</label>
+                <label for="description">Opis:</label>
                 <textarea id="description" name="description" formControlName="description" rows="4" maxlength="2000"></textarea>
                 <div class="error-message" *ngIf="description?.touched && description?.invalid">
                     <span *ngIf="description?.errors?.['required']">Opis je obavezan.</span>
                     <span *ngIf="description?.errors?.['maxlength']">Opis je predugačak.</span>
                 </div>
             </div>
-            <button type="submit">Upload</button>
+            <button type="submit">Otpremi</button>
         </form>
     </div>
 </div>
