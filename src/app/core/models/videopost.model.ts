@@ -11,6 +11,7 @@ export interface VideoResponseDTO {
     description: String;
     createdAt: Date;
     authorEmail: String;
+    authorUsername: String;
     status: VideoPostStatus;
     draftId: String;
     viewCount: number;

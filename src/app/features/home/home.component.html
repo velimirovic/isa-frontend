@@ -5,14 +5,8 @@
     
     <div class="videos-grid">
       <!-- Video placeholders -->
-       <a [routerLink]="" class="video-card" *ngFor="let video of videos">
+       <a [routerLink]="['/watch', video.draftId]" class="video-card" *ngFor="let video of videos">
         <div class="video-thumbnail">
-          <!-- <div class="thumbnail-placeholder">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </div> -->
-
           <img
                 [src]="getThumbnailUrl(video.thumbnailPath)"
                 class="thumbnail-image"
