@@ -7,6 +7,7 @@ import { ActivateComponent } from './features/auth/activate/activate.component';
 import { CheckEmailComponent } from './features/auth/check-email/check-email.component';
 import { AuthGuard } from './core/guards/auth.guard';
 import { UploadComponent } from './features/upload/upload/upload.component';
+import { VideoDetailsComponent } from './features/video-details/video-details.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -16,7 +17,8 @@ const routes: Routes = [
   { path: 'check-email', component: CheckEmailComponent },
   { path: 'home', redirectTo: '', pathMatch: 'full' },
   { path: 'upload', component: UploadComponent},
-  { path: '**', redirectTo: '' }
+  { path: 'watch/:id', component: VideoDetailsComponent },
+  { path: '**', redirectTo: '' },
 ];
 
 @NgModule({

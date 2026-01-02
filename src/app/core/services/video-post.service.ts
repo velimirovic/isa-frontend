@@ -106,4 +106,12 @@ export class VideoPostService {
 
         return lastValueFrom(request$);
     }
+
+    async getVideoDetails(draftId: string) : Promise<VideoResponseDTO> {
+        const request$ = this.http.get<VideoResponseDTO>(
+            this.baseUrl + '/' + draftId,            
+        )
+
+        return lastValueFrom(request$);
+    }
 }

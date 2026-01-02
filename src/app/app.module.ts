@@ -14,6 +14,7 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { UploadComponent } from './features/upload/upload/upload.component';
 import { MatIconModule } from '@angular/material/icon';
+import { VideoDetailsComponent } from './features/video-details/video-details.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { MatIconModule } from '@angular/material/icon';
     ActivateComponent,
     CheckEmailComponent,
     NavbarComponent,
-    UploadComponent
+    UploadComponent,
+    VideoDetailsComponent
   ],
   imports: [
     BrowserModule,
