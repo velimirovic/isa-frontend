@@ -1,30 +1,29 @@
 <div class="home-container">
-  <!-- Navbar Component -->
-  <app-navbar 
-    [isLoggedIn]="isLoggedIn" 
-    [username]="username"
-    (logout)="logout()">
-  </app-navbar>
-
   <!-- Main Content -->
   <main class="main-content">
     <h2 class="section-title">Video snimci</h2>
     
     <div class="videos-grid">
       <!-- Video placeholders -->
-      <div class="video-card" *ngFor="let video of videos">
+       <a [routerLink]="" class="video-card" *ngFor="let video of videos">
         <div class="video-thumbnail">
-          <div class="thumbnail-placeholder">
+          <!-- <div class="thumbnail-placeholder">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z"/>
             </svg>
-          </div>
+          </div> -->
+
+          <img
+                [src]="getThumbnailUrl(video.thumbnailPath)"
+                class="thumbnail-image"
+                [alt]="video.thumbnailPath"
+            />
         </div>
         <div class="video-info">
           <h3 class="video-title">{{ video.title }}</h3>
-          <p class="video-meta">{{ video.views }} pregleda • {{ video.date }}</p>
+        <p class="video-meta">{{ video.viewCount }} pregleda • {{ getDaysAgo(video.createdAt) }}</p>
         </div>
-      </div>
+       </a>
     </div>
   </main>
 </div>

@@ -1,0 +1,66 @@
+<div class="upload-container">
+    <div class="upload-form">
+        <form [formGroup]="form" (ngSubmit)="handleUpload()">        
+            <div class="drag-drop-area" 
+                [class.dragging]="isDraggingVideo"
+                (dragover)="onDragOverVideo($event)"
+                (dragleave)="onDragLeaveVideo($event)"
+                (drop)="onDropVideo($event)">
+                <div class="upload-instructions">
+                    <span class="material-icons">upload</span>
+                    <p>Prevuci video ovde ili</p>
+                    <input type="file" id="video" name="video" accept="video/*" (change)="onVideoSelected($event)" style="display:none" #videoInput />
+                    <button type="button" (click)="videoInput.click()">Izaberi Video</button>
+                    <p class="file-info">Maksimalna veličina: 200MB</p>
+                </div>
+                <div class="preview" *ngIf="videoPreviewUrl">
+                    <video [src]="videoPreviewUrl" controls width="100%" style="margin-top:10px;max-height:180px;"></video>
+                </div>
+                <div class="error-message" *ngIf="videoError">{{ videoError }}</div>
+            </div>
+
+            <div class="drag-drop-area" 
+                [class.dragging]="isDraggingThumbnail"
+                (dragover)="onDragOverThumbnail($event)"
+                (dragleave)="onDragLeaveThumbnail($event)"
+                (drop)="onDropThumbnail($event)">
+                <div class="upload-instructions">
+                    <span class="material-icons">upload</span>
+                    <p>Prevuci thumbnail ovde ili</p>
+                    <input type="file" id="thumbnail" name="thumbnail" accept="image/*" (change)="onThumbnailSelected($event)" style="display:none" #thumbnailInput />
+                    <button type="button" (click)="thumbnailInput.click()">
+                        Izaberi Sliku
+                    </button>
+                    <p class="file-info">Maksimalna veličina: 10MB</p>
+                </div>
+                <div class="preview" *ngIf="thumbnailPreviewUrl">
+                    <img [src]="thumbnailPreviewUrl" alt="Thumbnail preview" style="margin-top:10px;max-height:120px;max-width:100%;border-radius:6px;object-fit:cover;" />
+                </div>
+                <div class="error-message" *ngIf="thumbnailError">{{ thumbnailError }}</div>
+            </div>
+
+            <div *ngIf="uploadProgress > 0 && uploadProgress < 100">
+                <progress [value]="uploadProgress" max="100"></progress>
+                <span>{{ uploadProgress }}%</span>
+            </div>
+
+            <div>
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" formControlName="title" maxlength="100" />
+                <div class="error-message" *ngIf="title?.touched && title?.invalid">
+                    <span *ngIf="title?.errors?.['required']">Naslov je obavezan.</span>
+                    <span *ngIf="title?.errors?.['maxlength']">Naslov je predugačak.</span>
+                </div>
+            </div>
+            <div>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" formControlName="description" rows="4" maxlength="2000"></textarea>
+                <div class="error-message" *ngIf="description?.touched && description?.invalid">
+                    <span *ngIf="description?.errors?.['required']">Opis je obavezan.</span>
+                    <span *ngIf="description?.errors?.['maxlength']">Opis je predugačak.</span>
+                </div>
+            </div>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+</div>
