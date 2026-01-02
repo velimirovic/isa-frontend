@@ -6,6 +6,7 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { ActivateComponent } from './features/auth/activate/activate.component';
 import { CheckEmailComponent } from './features/auth/check-email/check-email.component';
 import { AuthGuard } from './core/guards/auth.guard';
+import { UploadComponent } from './features/upload/upload/upload.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -14,6 +15,7 @@ const routes: Routes = [
   { path: 'activate', component: ActivateComponent },
   { path: 'check-email', component: CheckEmailComponent },
   { path: 'home', redirectTo: '', pathMatch: 'full' },
+  { path: 'upload', component: UploadComponent},
   { path: '**', redirectTo: '' }
 ];
 

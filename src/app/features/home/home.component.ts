@@ -1,7 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { Subscription } from 'rxjs';
+import { UserService } from 'src/app/core/services/user.service';
+import { VideoPostService } from 'src/app/core/services/video-post.service';
+import { VideoResponseDTO } from 'src/app/core/models/videopost.model';
 
 interface Video {
   id: number;
@@ -15,65 +18,51 @@ interface Video {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit {
   username: string = '';
   isLoggedIn: boolean = false;
   private authSubscription?: Subscription;
-  
-  // Mock video data
-  videos: Video[] = [
-    { id: 1, title: 'Video snimak 1', views: '1.2K', date: 'Pre 2 dana' },
-    { id: 2, title: 'Video snimak 2', views: '856', date: 'Pre 3 dana' },
-    { id: 3, title: 'Video snimak 3', views: '2.4K', date: 'Pre 5 dana' },
-    { id: 4, title: 'Video snimak 4', views: '3.1K', date: 'Pre 1 nedelju' },
-    { id: 5, title: 'Video snimak 5', views: '945', date: 'Pre 2 nedelje' },
-    { id: 6, title: 'Video snimak 6', views: '1.8K', date: 'Pre 2 nedelje' },
-    { id: 7, title: 'Video snimak 7', views: '4.2K', date: 'Pre 3 nedelje' },
-    { id: 8, title: 'Video snimak 8', views: '1.5K', date: 'Pre 1 mesec' },
-    { id: 9, title: 'Video snimak 9', views: '2.7K', date: 'Pre 1 mesec' },
-    { id: 10, title: 'Video snimak 10', views: '892', date: 'Pre 1 mesec' },
-    { id: 11, title: 'Video snimak 11', views: '3.5K', date: 'Pre 2 meseca' },
-    { id: 12, title: 'Video snimak 12', views: '1.1K', date: 'Pre 2 meseca' }
-  ];
+  page: number = 0;
+    
+  videos: VideoResponseDTO[] = [];
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private videoPostService: VideoPostService
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to authentication status changes
-    this.authSubscription = this.authService.isAuthenticated$.subscribe(
-      isAuthenticated => {
-        this.isLoggedIn = isAuthenticated;
-        
-        if (isAuthenticated) {
-          const token = this.authService.getToken();
-          if (token) {
-            try {
-              const payload = JSON.parse(atob(token.split('.')[1]));
-              // Token sadrži sub (email), prikaži ga kao username
-              this.username = payload.sub || '';
-            } catch (e) {
-              console.error('Error parsing token', e);
-            }
-          }
-        } else {
-          this.username = '';
+    this.loadVideos();
+  }
+
+  loadVideos(): void {
+    this.videoPostService.getAllVideoPosts(this.page).subscribe({
+        next: (videos) => {
+        this.videos = videos;
+        },
+        error: (err) => {
+        console.error('Greška pri učitavanju videa', err);
         }
-      }
-    );
+    });
   }
 
-  ngOnDestroy(): void {
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
+  getDaysAgo(createdAt: string | Date): String {
+    const date = new Date(createdAt);
+    if (isNaN(date.getTime())) {
+      return ""; // fallback ako backend vrati nešto čudno
     }
+
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    return diffDays <= 0 ? "Danas" : "Pre " + diffDays + " dana";
   }
 
-  logout(): void {
-    if (confirm('Da li ste sigurni da želite da se odjavite?')) {
-      this.authService.logout();
+  imageBaseUrl = 'http://localhost:8080/';
+
+    getThumbnailUrl(path: String): String {
+        return this.videoPostService.getThumbnailUrl(path);
     }
-  }
 }

@@ -26,7 +26,7 @@
 /* Videos Grid */
 .videos-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   margin-bottom: 40px;
 }
@@ -45,11 +45,24 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.video-thumbnail {
+/* .video-thumbnail {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  padding-top: 56.25%;
   background: linear-gradient(135deg, #3cd9a7 0%, #2ab88a 100%);
+} */
+
+.video-thumbnail {
+  width: 100%;
+  aspect-ratio: 16 / 9; /* ili šta hoćeš */
+  overflow: hidden;
+}
+
+.thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .thumbnail-placeholder {
@@ -81,6 +94,7 @@
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

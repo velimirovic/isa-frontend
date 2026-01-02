@@ -1,0 +1,149 @@
+
+.upload-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 60vh;
+	background: #f7f9fa;
+	border-radius: 12px;
+	box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+	padding: 32px 0;
+}
+
+.upload-form {
+	background: #fff;
+	padding: 32px 40px;
+	border-radius: 12px;
+	box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+	min-width: 340px;
+	max-width: 400px;
+	width: 100%;
+}
+
+.upload-form form {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.upload-form label {
+	font-weight: 500;
+	margin-bottom: 6px;
+	color: #222b45;
+}
+
+.upload-form input[type="text"],
+.upload-form textarea {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #dbe2ef;
+	border-radius: 6px;
+	font-size: 1rem;
+	background: #f9fafb;
+	transition: border 0.2s;
+}
+
+.upload-form input[type="text"]:focus,
+.upload-form textarea:focus {
+	border: 1.5px solid #3f72af;
+	outline: none;
+}
+
+.upload-form input[type="file"] {
+	border: none;
+	background: none;
+	font-size: 1rem;
+	margin-top: 4px;
+}
+
+.upload-form button[type="submit"] {
+	width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #3cd9a7 0%, #2ab88a 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    box-shadow: 0 6px 20px rgba(60, 217, 167, 0.3)
+}
+
+.upload-form button[type="submit"]:hover {
+	transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(60, 217, 167, 0.4);
+}
+
+.upload-form div {
+	display: flex;
+	flex-direction: column;
+
+}
+
+.drag-drop-area {
+	border: 2px dashed #ccc;
+	border-radius: 8px;
+	padding: 28px 18px;
+	text-align: center;
+	transition: all 0.3s ease;
+	background-color: #fafafa;
+	cursor: pointer;
+	margin-bottom: 12px;
+}
+.drag-drop-area.dragging {
+	border-color: #3cd9a7;
+	background-color: #e0f7f1;
+	transform: scale(1.01);
+}
+.upload-instructions {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+.upload-instructions .material-icons {
+	font-size: 44px;
+	color: #2ab88a;
+}
+.upload-instructions p {
+	margin: 0;
+	color: #616161;
+}
+.upload-instructions .file-info {
+	font-size: 12px;
+	color: #9e9e9e;
+}
+.drag-drop-area button[type="button"] {
+	margin-top: 6px;
+	background: #3cd9a7;
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	padding: 7px 18px;
+	font-size: 1rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+.drag-drop-area button[type="button"]:hover {
+	background: #2ab88a;
+}
+.preview {
+	margin-top: 8px;
+	display: flex;
+	justify-content: center;
+}
+
+.error-message {
+	color: #e65100;
+	font-size: 13px;
+	margin-top: 4px;
+	text-align: left;
+}
+
+
+#description {
+    resize: vertical;
+}

@@ -60,6 +60,10 @@
   gap: 16px;
 }
 
+.user-section a {
+    text-decoration: none;
+}
+
 .user-info {
   display: flex;
   align-items: center;

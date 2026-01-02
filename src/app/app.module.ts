@@ -12,6 +12,8 @@ import { ActivateComponent } from './features/auth/activate/activate.component';
 import { CheckEmailComponent } from './features/auth/check-email/check-email.component';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { NavbarComponent } from './shared/navbar/navbar.component';
+import { UploadComponent } from './features/upload/upload/upload.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -21,13 +23,15 @@ import { NavbarComponent } from './shared/navbar/navbar.component';
     LoginComponent,
     ActivateComponent,
     CheckEmailComponent,
-    NavbarComponent
+    NavbarComponent,
+    UploadComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     ReactiveFormsModule,
-    AppRoutingModule
+    AppRoutingModule,
+    MatIconModule
   ],
   providers: [
     {
