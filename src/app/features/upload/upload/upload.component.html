@@ -60,6 +60,36 @@
                     <span *ngIf="description?.errors?.['maxlength']">Opis je predugačak.</span>
                 </div>
             </div>
+            <div class="tags-section">
+                <label for="tags">Tagovi:</label>
+                <input
+                    type="text"
+                    id="tags"
+                    #tagInput
+                    placeholder="Unesi tag i pritisni Enter"
+                    (keydown.enter)="onTagEnter($any($event), tagInput)" />
+
+                <div class="tag-buttons">
+                    <button type="button" class="tag-add-btn" (click)="addTagFromInput(tagInput)">
+                        Dodaj
+                    </button>
+
+                    <button type="button" class="tag-remove-all-btn" (click)="removeAllTags()" [disabled]="!tags?.length">
+                        Ukloni sve
+                    </button>
+                </div>                
+
+                <div class="tags-list" *ngIf="tags?.length">
+                    <span class="tag-item" *ngFor="let tag of tags">
+                        {{ tag }}
+                        <button type="button" (click)="removeTag(tag)">×</button>
+                    </span>
+                </div>
+
+                <div class="error-message" *ngIf="tagsError">
+                    {{ tagsError }}
+                </div>
+            </div>
             <button type="submit">Otpremi</button>
         </form>
     </div>

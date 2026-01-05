@@ -18,6 +18,7 @@ export class VideoDetailsComponent {
     ) {}
     draftId : string | null = null;
     videoDetails : VideoResponseDTO | null = null;
+    videoTags: string[] = [];
     suggestedVideos: VideoResponseDTO[] = [];
 
     ngOnInit() {
@@ -35,6 +36,7 @@ export class VideoDetailsComponent {
     private async loadVideoAndSuggestions(id: string | null) {
         this.draftId = id;
         this.videoDetails = null;
+        this.videoTags = [];
 
         if (!this.draftId) {
             return;
@@ -44,11 +46,30 @@ export class VideoDetailsComponent {
             this.videoDetails = await this.getVideoDetails(this.draftId);
             if (this.videoDetails) {
                 this.videoDetails.videoPath = environment.mediaHost + this.videoDetails.videoPath;
+                this.videoTags = this.extractTags(this.videoDetails.tagNames as any);
             }
             this.loadSuggestedVideos();
         } catch (err) {
             console.error('Error loading video details', err);
         }
+    }
+
+    private extractTags(raw: unknown): string[] {
+        if (raw == null) {
+            return [];
+        }
+
+        if (Array.isArray(raw)) {
+            return raw
+                .map(t => t != null ? t.toString().trim() : '')
+                .filter(t => t.length > 0);
+        }
+
+        return raw
+            .toString()
+            .split(',')
+            .map(t => t.trim())
+            .filter(t => t.length > 0);
     }
 
     private loadSuggestedVideos(): void {
