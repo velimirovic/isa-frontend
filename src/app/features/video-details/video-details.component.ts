@@ -64,7 +64,7 @@ export class VideoDetailsComponent {
         });
     }
 
-    getThumbnailUrl(path: String): String {
-        return this.videoPostService.getThumbnailUrl(path);
+    getThumbnailUrl(draftId: String): String {
+        return environment.apiHost + "video-posts/" + draftId + "/thumbnail";
     }
 }

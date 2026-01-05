@@ -8,7 +8,7 @@
        <a [routerLink]="['/watch', video.draftId]" class="video-card" *ngFor="let video of videos">
         <div class="video-thumbnail">
           <img
-                [src]="getThumbnailUrl(video.thumbnailPath)"
+                [src]="getThumbnailUrl(video.draftId)"
                 class="thumbnail-image"
                 [alt]="video.thumbnailPath"
             />
