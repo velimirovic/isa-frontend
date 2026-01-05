@@ -83,14 +83,19 @@ export class VideoPostService {
         return lastValueFrom(request$);
     }
 
-    async uploadPostDetails(title: string, description: string, draftId : string) : Promise<string> {
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
+    async uploadPostDetails(title: string, description: string, tags: string[], draftId : string) : Promise<string> {
+        // const formData = new FormData();
+        // formData.append('title', title);
+        // formData.append('description', description);
+        // tags.forEach(tag => {
+        //     formData.append('tags', tag);
+        // });
+
+        const body = { title, description, tags};
         
         const request$ = this.http.patch(
             this.baseUrl + '/' + draftId,
-            formData,
+            body,
             {
                 responseType: 'text',
             }

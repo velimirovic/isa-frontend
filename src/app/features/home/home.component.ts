@@ -62,7 +62,7 @@ export class HomeComponent implements OnInit {
 
   imageBaseUrl = 'http://localhost:8080/';
 
-    getThumbnailUrl(path: String): String {
-        return this.videoPostService.getThumbnailUrl(path);
+    getThumbnailUrl(draftId: String): String {
+        return this.imageBaseUrl + "api/video-posts/" + draftId + "/thumbnail";
     }
 }

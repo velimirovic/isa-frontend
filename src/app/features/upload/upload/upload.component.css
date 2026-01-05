@@ -76,12 +76,6 @@
     box-shadow: 0 10px 30px rgba(60, 217, 167, 0.4);
 }
 
-.upload-form div {
-	display: flex;
-	flex-direction: column;
-
-}
-
 .drag-drop-area {
 	border: 2px dashed #ccc;
 	border-radius: 8px;
@@ -146,4 +140,103 @@
 
 #description {
     resize: vertical;
+}
+
+.tags-section {
+	margin-top: 8px;
+}
+
+.tags-section label {
+	margin-bottom: 4px;
+}
+
+.tags-section input#tags {
+	margin-top: 4px;
+}
+
+.tags-input-row {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.tags-input-row input#tags {
+	flex: 1;
+}
+
+
+.tag-buttons{
+	display: flex;
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.tag-add-btn,
+.tag-remove-all-btn {
+	padding: 8px 12px;
+	border-radius: 6px;
+	border: none;
+	cursor: pointer;
+	font-size: 0.85rem;
+	font-weight: 600;
+    flex: 1;    
+}
+
+.tag-add-btn {
+	background: #3cd9a7;
+	color: #fff;
+}
+
+.tag-add-btn:hover {
+	background: #2ab88a;
+}
+
+.tag-remove-all-btn {
+	background: #e5e7eb;
+	color: #374151;
+}
+
+.tag-remove-all-btn:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.tags-list {
+	margin-top: 8px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 6px 8px;
+	border-radius: 8px;
+	background: #f5f7fb;
+	border: 1px solid #dbe2ef;
+	max-height: 110px; /* nakon više tagova pojavi se scroll */
+	overflow-y: auto;
+}
+
+.tag-item {
+	display: inline-flex;
+	align-items: center;
+    justify-content: space-between;
+	padding: 4px 10px;
+	border-radius: 999px;
+	background: #e3fcec;
+	color: #1b4332;
+	font-size: 0.85rem;
+	gap: 6px;
+}
+
+.tag-item button[type="button"] {
+	border: none;
+	background: transparent;
+	color: #64748b;
+	cursor: pointer;
+	font-size: 24px;
+	padding: 0;
+	line-height: 1;
+}
+
+.tag-item button[type="button"]:hover {
+	color: #ef4444;
 }

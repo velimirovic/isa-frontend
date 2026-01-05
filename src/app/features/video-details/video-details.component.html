@@ -2,8 +2,12 @@
     <div class="watch-comment-section">
         <div class='watch-section'>
             <video [src]="videoDetails?.videoPath" controls width="100%"></video>
-            
+
             <h1 class="video-title">{{videoDetails?.title}}</h1>
+
+            <div class="tags" *ngIf="videoTags.length">
+                <span class="tag-pill" *ngFor="let tag of videoTags">{{ tag }}</span>
+            </div>
             <div class="watch-metadata">
                 <span class="channel">
                     <mat-icon>person</mat-icon>
@@ -50,7 +54,7 @@
             >
                 <div class="suggested-thumbnail">
                     <img
-                        [src]="getThumbnailUrl(video.thumbnailPath)"
+                        [src]="getThumbnailUrl(video.draftId)"
                         [alt]="video.title"
                     />
                 </div>

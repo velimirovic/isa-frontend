@@ -15,6 +15,7 @@ export interface VideoResponseDTO {
     status: VideoPostStatus;
     draftId: String;
     viewCount: number;
+    tagNames: String[];
 }
 
 export interface VideoPostDraftDTO {

@@ -40,6 +40,9 @@ export class UploadComponent implements OnInit, OnDestroy {
     thumbnailError = '';
     uploadProgress = 0;
 
+    tags: string[] = [];
+    tagsError = '';
+
     constructor(
         private fb: FormBuilder,
         private videoPostService: VideoPostService,
@@ -119,10 +122,11 @@ export class UploadComponent implements OnInit, OnDestroy {
         }
     }
 
-    // Basic client-side handling (bez stvarnog uploada)
+
     async handleUpload(): Promise<void> {
         this.videoError = '';
         this.thumbnailError = '';
+        this.tagsError = '';
 
         if (this.form.invalid) {
             this.form.markAllAsTouched();
@@ -153,7 +157,7 @@ export class UploadComponent implements OnInit, OnDestroy {
             console.log(this.title.value);
             console.log(this.description.value);
 
-            res = await this.videoPostService.uploadPostDetails(this.title.value, this.description.value, this.draftId);
+            res = await this.videoPostService.uploadPostDetails(this.title.value, this.description.value, this.tags, this.draftId);
         }
         
         if (res.match("success") && this.draftId) 
@@ -162,6 +166,41 @@ export class UploadComponent implements OnInit, OnDestroy {
             console.log(result);
             this.router.navigate(['/']);
         }
+    }
+
+    onTagEnter(event: KeyboardEvent, input: HTMLInputElement): void {
+        event.preventDefault();
+        const value = input.value.trim();
+        this.addTag(value);
+        input.value = '';
+    }
+
+    addTagFromInput(input: HTMLInputElement): void {
+        const value = input.value.trim();
+        this.addTag(value);
+        input.value = '';
+    }
+
+    private addTag(value: string): void {
+        if (!value) {
+            return;
+        }
+
+        if (!this.tags.includes(value)) {
+            this.tags.push(value);
+            this.tagsError = '';
+        } else {
+            this.tagsError = 'Tag je već dodat.';
+        }
+    }
+
+    removeTag(tag: string): void {
+        this.tags = this.tags.filter(t => t !== tag);
+    }
+
+    removeAllTags(): void {
+        this.tags = [];
+        this.tagsError = '';
     }
 
     // Helpers
