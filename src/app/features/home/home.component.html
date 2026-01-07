@@ -15,7 +15,10 @@
         </div>
         <div class="video-info">
           <h3 class="video-title">{{ video.title }}</h3>
-        <p class="video-meta">{{ video.viewCount }} pregleda • {{ getDaysAgo(video.createdAt) }}</p>
+        <p class="video-meta">
+          {{ video.viewCount }} pregleda • {{ getDaysAgo(video.createdAt) }}<br>
+          <a [routerLink]="['/profile', video.authorUsername]">{{ video.authorUsername }}</a>
+        </p>
         </div>
        </a>
     </div>

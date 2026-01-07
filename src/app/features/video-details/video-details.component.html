@@ -11,7 +11,9 @@
             <div class="watch-metadata">
                 <span class="channel">
                     <mat-icon>person</mat-icon>
-                    {{videoDetails?.authorUsername ?? " "}}
+                    <a *ngIf="videoDetails?.authorUsername" [routerLink]="['/profile', videoDetails!.authorUsername]">
+                      {{videoDetails?.authorUsername}}
+                    </a>
                 </span>
 
                 <span class="watch-metadata-controls">
@@ -22,10 +24,10 @@
                         {{videoDetails?.createdAt | date:'dd.MM.yyyy'}}
                     </span>
                     <span class="like-dislike">
-                        <span class="like">
+                        <span class="like" (click)="handleLike()">
                             <mat-icon>thumb_up</mat-icon>
                         </span>
-                        <span class="dislike">
+                        <span class="dislike" (click)="handleDislike()">
                             <mat-icon>thumb_down</mat-icon>
                         </span>
                     </span>
@@ -40,7 +42,13 @@
             </div>
         </div>
         <div class="comment-section">
-            <i>Komentari idu ovde</i>
+            <ng-container *ngIf="isLoggedIn; else loginToComment">
+                <!-- Komponenta za unos komentara, ako postoji -->
+            </ng-container>
+            <ng-template #loginToComment>
+                <div class="alert alert-info">Morate biti prijavljeni da biste komentarisali.</div>
+            </ng-template>
+            <i *ngIf="!isLoggedIn">Komentari idu ovde</i>
         </div>
     </div>
     

@@ -4,6 +4,7 @@ import { VideoResponseDTO } from 'src/app/core/models/videopost.model';
 import { VideoPostService } from 'src/app/core/services/video-post.service';
 import { environment } from 'src/env/environment';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-video-details',
@@ -15,11 +16,31 @@ export class VideoDetailsComponent {
         private route: ActivatedRoute,
         private videoPostService: VideoPostService,
         private router: Router,
+        private authService: AuthService,
     ) {}
     draftId : string | null = null;
     videoDetails : VideoResponseDTO | null = null;
     videoTags: string[] = [];
     suggestedVideos: VideoResponseDTO[] = [];
+    get isLoggedIn(): boolean {
+        return this.authService.isLoggedIn();
+    }
+
+    handleLike(): void {
+        if (!this.isLoggedIn) {
+            alert('Morate biti prijavljeni da biste lajkovali!');
+        } else {
+            // Implementacija lajkovanja
+        }
+    }
+
+    handleDislike(): void {
+        if (!this.isLoggedIn) {
+            alert('Morate biti prijavljeni da biste dislajkovali!');
+        } else {
+            // Implementacija dislajkovanja
+        }
+    }
 
     ngOnInit() {
 		// React to id changes on the same /watch/:id route
