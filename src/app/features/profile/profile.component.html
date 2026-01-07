@@ -1,0 +1,48 @@
+<div class="profile-container">
+  <div *ngIf="loading" class="loading">Učitavanje profila...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+  
+  <div *ngIf="user && !loading" class="profile-content">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <mat-icon class="avatar-icon">account_circle</mat-icon>
+      </div>
+      <div class="profile-info">
+        <h1 class="profile-username">{{ user.username }}</h1>
+        <p class="profile-email">
+          <mat-icon class="email-icon">email</mat-icon>
+          {{ user.email }}
+        </p>
+      </div>
+    </div>
+
+    <div class="profile-videos">
+      <h2 class="section-title">
+        <mat-icon>video_library</mat-icon>
+        Video snimci
+      </h2>
+      
+      <div *ngIf="videos.length === 0" class="no-videos">
+        <p>Korisnik još nije postavio nijedan video.</p>
+      </div>
+
+      <div class="videos-grid" *ngIf="videos.length > 0">
+        <a [routerLink]="['/watch', video.draftId]" class="video-card" *ngFor="let video of videos">
+          <div class="video-thumbnail">
+            <img
+              [src]="getThumbnailUrl(video.draftId)"
+              class="thumbnail-image"
+              [alt]="video.title"
+            />
+          </div>
+          <div class="video-info">
+            <h3 class="video-title">{{ video.title }}</h3>
+            <p class="video-meta">
+              {{ video.viewCount }} pregleda • {{ getDaysAgo(video.createdAt) }}
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

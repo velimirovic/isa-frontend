@@ -75,6 +75,18 @@
     margin-right: 5px;
 }
 
+.channel a {
+  color: #3cd9a7;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.channel a:hover {
+  color: #2ab88a;
+  text-decoration: underline;
+}
+
 .watch-metadata-controls {
 	display: flex;
 	align-items: center;

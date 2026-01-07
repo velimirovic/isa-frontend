@@ -25,6 +25,10 @@ export class VideoPostService {
         });
     }
 
+    getUserVideoPosts(username: string): Observable<VideoResponseDTO[]> {
+        return this.http.get<VideoResponseDTO[]>(`${this.baseUrl}/user/${username}`);
+    }
+
     getThumbnailUrl(path: String): String {
         return environment.mediaHost + path;
     }

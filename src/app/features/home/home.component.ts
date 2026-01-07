@@ -50,14 +50,22 @@ export class HomeComponent implements OnInit {
   getDaysAgo(createdAt: string | Date): String {
     const date = new Date(createdAt);
     if (isNaN(date.getTime())) {
-      return ""; // fallback ako backend vrati nešto čudno
+      return "";
     }
 
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    return diffDays <= 0 ? "Danas" : "Pre " + diffDays + " dana";
+    if (diffDays <= 0) {
+      return "Danas";
+    } else if (diffDays === 1) {
+      return "Juče";
+    } else if (diffDays < 7) {
+      return "Pre " + diffDays + " dana";
+    } else {
+      return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'numeric', year: 'numeric' });
+    }
   }
 
   imageBaseUrl = 'http://localhost:8080/';

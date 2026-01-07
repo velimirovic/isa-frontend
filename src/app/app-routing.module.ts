@@ -8,6 +8,7 @@ import { CheckEmailComponent } from './features/auth/check-email/check-email.com
 import { AuthGuard } from './core/guards/auth.guard';
 import { UploadComponent } from './features/upload/upload/upload.component';
 import { VideoDetailsComponent } from './features/video-details/video-details.component';
+import { ProfileComponent } from './features/profile/profile.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path: 'home', redirectTo: '', pathMatch: 'full' },
   { path: 'upload', component: UploadComponent},
   { path: 'watch/:id', component: VideoDetailsComponent },
+  { path: 'profile/:username', component: ProfileComponent },
   { path: '**', redirectTo: '' },
 ];
 
