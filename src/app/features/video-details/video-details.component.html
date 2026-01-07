@@ -42,13 +42,66 @@
             </div>
         </div>
         <div class="comment-section">
-            <ng-container *ngIf="isLoggedIn; else loginToComment">
-                <!-- Komponenta za unos komentara, ako postoji -->
-            </ng-container>
-            <ng-template #loginToComment>
-                <div class="alert alert-info">Morate biti prijavljeni da biste komentarisali.</div>
-            </ng-template>
-            <i *ngIf="!isLoggedIn">Komentari idu ovde</i>
+            <h3 class="comment-title">Komentari</h3>
+            
+            <!-- Forma za dodavanje komentara -->
+            <div class="add-comment">
+                <textarea 
+                    [formControl]="commentControl"
+                    placeholder="Dodaj komentar..."
+                    rows="3"
+                    class="comment-input"
+                ></textarea>
+                <button 
+                    (click)="submitComment()" 
+                    [disabled]="commentControl.invalid"
+                    class="comment-submit-btn"
+                >
+                    Komentariši
+                </button>
+            </div>
+
+            <!-- Lista komentara -->
+            <div class="comments-list">
+                <div *ngIf="loadingComments" class="loading-comments">Učitavanje komentara...</div>
+                
+                <div *ngIf="!loadingComments && comments.length === 0" class="no-comments">
+                    Nema komentara. Budite prvi koji će komentarisati!
+                </div>
+
+                <div *ngIf="comments.length > 0" class="comments-count">
+                    Prikazano {{ comments.length }} od {{ totalComments }} komentara
+                </div>
+
+                <div *ngFor="let comment of comments" class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author">
+                            <mat-icon>account_circle</mat-icon>
+                            <a [routerLink]="['/profile', comment.authorUsername]">
+                                {{ comment.authorUsername }}
+                            </a>
+                        </span>
+                        <span class="comment-time">{{ getTimeAgo(comment.createdAt) }}</span>
+                    </div>
+                    <div class="comment-content">{{ comment.content }}</div>
+                    <div class="comment-actions" *ngIf="canDeleteComment(comment)">
+                        <button (click)="deleteComment(comment.id)" class="delete-comment-btn">
+                            <mat-icon>delete</mat-icon>
+                            Obriši
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dugme za učitavanje više komentara -->
+                <button 
+                    *ngIf="totalCommentPages > 1 && commentPage < totalCommentPages - 1" 
+                    (click)="loadMoreComments()"
+                    class="load-more-btn"
+                    [disabled]="loadingComments"
+                >
+                    Prikaži još komentara
+                </button>
+            </div>
         </div>
     </div>
     
