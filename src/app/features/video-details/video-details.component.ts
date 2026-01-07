@@ -33,6 +33,11 @@ export class VideoDetailsComponent {
     totalComments: number = 0;
     loadingComments: boolean = false;
     commentControl = new FormControl('', [Validators.required, Validators.minLength(1), Validators.maxLength(500)]);
+    
+    // Like sistem
+    likeCount: number = 0;
+    likedByUser: boolean = false;
+    
     get isLoggedIn(): boolean {
         return this.authService.isLoggedIn();
     }
@@ -40,17 +45,21 @@ export class VideoDetailsComponent {
     handleLike(): void {
         if (!this.isLoggedIn) {
             alert('Morate biti prijavljeni da biste lajkovali!');
-        } else {
-            // Implementacija lajkovanja
+            return;
         }
-    }
+        
+        if (!this.videoDetails) return;
 
-    handleDislike(): void {
-        if (!this.isLoggedIn) {
-            alert('Morate biti prijavljeni da biste dislajkovali!');
-        } else {
-            // Implementacija dislajkovanja
-        }
+        this.videoPostService.toggleLike(this.videoDetails.id).subscribe({
+            next: (response) => {
+                this.likeCount = response.likeCount;
+                this.likedByUser = response.likedByUser;
+            },
+            error: (err) => {
+                console.error('Greška pri lajkovanju', err);
+                alert('Greška pri lajkovanju. Pokušajte ponovo.');
+            }
+        });
     }
 
     ngOnInit() {
@@ -73,6 +82,8 @@ export class VideoDetailsComponent {
         this.videoTags = [];
         this.comments = [];
         this.commentPage = 0;
+        this.likeCount = 0;
+        this.likedByUser = false;
 
         if (!id) {
             return;
@@ -84,6 +95,7 @@ export class VideoDetailsComponent {
                 this.videoDetails.videoPath = environment.mediaHost + this.videoDetails.videoPath;
                 this.videoTags = this.extractTags(this.videoDetails.tagNames as any);
                 this.loadComments();
+                this.loadLikeStatus();
             }
             this.loadSuggestedVideos();
         } catch (err) {
@@ -124,6 +136,20 @@ export class VideoDetailsComponent {
 
     getThumbnailUrl(draftId: String): String {
         return environment.apiHost + "video-posts/" + draftId + "/thumbnail";
+    }
+
+    loadLikeStatus(): void {
+        if (!this.videoDetails) return;
+
+        this.videoPostService.getLikeStatus(this.videoDetails.id).subscribe({
+            next: (response) => {
+                this.likeCount = response.likeCount;
+                this.likedByUser = response.likedByUser;
+            },
+            error: (err) => {
+                console.error('Greška pri učitavanju like statusa', err);
+            }
+        });
     }
 
     loadComments(): void {

@@ -112,8 +112,7 @@
 	background-color: #f9fafb;
 }
 
-.like,
-.dislike {
+.like {
 	padding: 6px 12px;
 	cursor: pointer;
 	font-size: 0.85rem;
@@ -122,17 +121,30 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 6px;
 }
 
-.like:hover,
-.dislike:hover {
+.like:hover {
 	background-color: #3cd9a7;
 	color: #ffffff;
 	box-shadow: 0 2px 6px rgba(60, 217, 167, 0.5);
 }
 
-.like {
-	border-right: 1px solid #e5e7eb;
+.like.liked {
+	background-color: #3cd9a7;
+	color: #ffffff;
+	font-weight: 600;
+}
+
+.like.liked:hover {
+	background-color: #2ab88a;
+}
+
+.like-count {
+	font-size: 0.85rem;
+	font-weight: 500;
+	min-width: 20px;
+	text-align: center;
 }
 
 .share {

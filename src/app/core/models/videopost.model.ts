@@ -16,6 +16,8 @@ export interface VideoResponseDTO {
     draftId: String;
     viewCount: number;
     tagNames: String[];
+    likeCount?: number;
+    likedByUser?: boolean;
 }
 
 export interface VideoPostDraftDTO {
