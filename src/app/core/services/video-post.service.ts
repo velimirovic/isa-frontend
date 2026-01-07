@@ -6,11 +6,17 @@ import { Injectable } from '@angular/core';
 import { AuthService } from "./auth.service";
 import { Subscription } from "rxjs";
 
+export interface LikeResponseDTO {
+    likeCount: number;
+    likedByUser: boolean;
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class VideoPostService {
     private baseUrl = environment.apiHost+'video-posts';
+    private interactionsUrl = environment.apiHost+'interactions';
     private authSubscription?: Subscription;
 
 
@@ -122,5 +128,19 @@ export class VideoPostService {
         )
 
         return lastValueFrom(request$);
+    }
+
+    // Like metode
+    toggleLike(videoId: number): Observable<LikeResponseDTO> {
+        return this.http.post<LikeResponseDTO>(
+            `${this.interactionsUrl}/videos/${videoId}/like`,
+            null
+        );
+    }
+
+    getLikeStatus(videoId: number): Observable<LikeResponseDTO> {
+        return this.http.get<LikeResponseDTO>(
+            `${this.interactionsUrl}/videos/${videoId}/likes`
+        );
     }
 }

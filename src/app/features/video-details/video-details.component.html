@@ -24,11 +24,9 @@
                         {{videoDetails?.createdAt | date:'dd.MM.yyyy'}}
                     </span>
                     <span class="like-dislike">
-                        <span class="like" (click)="handleLike()">
-                            <mat-icon>thumb_up</mat-icon>
-                        </span>
-                        <span class="dislike" (click)="handleDislike()">
-                            <mat-icon>thumb_down</mat-icon>
+                        <span class="like" (click)="handleLike()" [class.liked]="likedByUser">
+                            <mat-icon>{{ likedByUser ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
+                            <span class="like-count">{{ likeCount }}</span>
                         </span>
                     </span>
                     <span class="share">
