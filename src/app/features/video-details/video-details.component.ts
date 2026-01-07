@@ -5,6 +5,9 @@ import { VideoPostService } from 'src/app/core/services/video-post.service';
 import { environment } from 'src/env/environment';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { CommentService } from 'src/app/core/services/comment.service';
+import { Comment } from 'src/app/core/models/comment.model';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-video-details',
@@ -17,11 +20,19 @@ export class VideoDetailsComponent {
         private videoPostService: VideoPostService,
         private router: Router,
         private authService: AuthService,
+        private commentService: CommentService,
     ) {}
     draftId : string | null = null;
     videoDetails : VideoResponseDTO | null = null;
     videoTags: string[] = [];
     suggestedVideos: VideoResponseDTO[] = [];
+    comments: Comment[] = [];
+    commentPage: number = 0;
+    commentPageSize: number = 10;
+    totalCommentPages: number = 0;
+    totalComments: number = 0;
+    loadingComments: boolean = false;
+    commentControl = new FormControl('', [Validators.required, Validators.minLength(1), Validators.maxLength(500)]);
     get isLoggedIn(): boolean {
         return this.authService.isLoggedIn();
     }
@@ -46,7 +57,10 @@ export class VideoDetailsComponent {
 		// React to id changes on the same /watch/:id route
 		this.route.paramMap.subscribe(params => {
 			const id = params.get('id');
-			this.loadVideoAndSuggestions(id);
+			if (id) {
+				this.draftId = id;
+				this.loadVideoAndSuggestions(id);
+			}
 		});
     }
 
@@ -55,19 +69,21 @@ export class VideoDetailsComponent {
     }
 
     private async loadVideoAndSuggestions(id: string | null) {
-        this.draftId = id;
         this.videoDetails = null;
         this.videoTags = [];
+        this.comments = [];
+        this.commentPage = 0;
 
-        if (!this.draftId) {
+        if (!id) {
             return;
         }
 
         try {
-            this.videoDetails = await this.getVideoDetails(this.draftId);
+            this.videoDetails = await this.getVideoDetails(id);
             if (this.videoDetails) {
                 this.videoDetails.videoPath = environment.mediaHost + this.videoDetails.videoPath;
                 this.videoTags = this.extractTags(this.videoDetails.tagNames as any);
+                this.loadComments();
             }
             this.loadSuggestedVideos();
         } catch (err) {
@@ -109,4 +125,112 @@ export class VideoDetailsComponent {
     getThumbnailUrl(draftId: String): String {
         return environment.apiHost + "video-posts/" + draftId + "/thumbnail";
     }
+
+    loadComments(): void {
+        if (!this.videoDetails) {
+            console.log('loadComments: videoDetails is null');
+            return;
+        }
+        
+        console.log('Loading comments for video ID:', this.videoDetails.id, 'page:', this.commentPage);
+        this.loadingComments = true;
+        this.commentService.getComments(this.videoDetails.id, this.commentPage, this.commentPageSize).subscribe({
+            next: (response) => {
+                console.log('Comments loaded:', response);
+                if (this.commentPage === 0) {
+                    this.comments = response.content;
+                } else {
+                    this.comments = [...this.comments, ...response.content];
+                }
+                this.totalCommentPages = response.totalPages;
+                this.totalComments = response.totalElements;
+                this.loadingComments = false;
+            },
+            error: (err) => {
+                console.error('Greška pri učitavanju komentara', err);
+                this.loadingComments = false;
+            }
+        });
+    }
+
+    submitComment(): void {
+        if (!this.isLoggedIn) {
+            alert('Morate biti prijavljeni da biste komentarisali!');
+            return;
+        }
+
+        if (this.commentControl.invalid || !this.videoDetails) {
+            return;
+        }
+
+        const content = this.commentControl.value?.trim();
+        if (!content) return;
+
+        this.commentService.createComment(this.videoDetails.id, { content }).subscribe({
+            next: (newComment) => {
+                console.log('Komentar dodat:', newComment);
+                // Odmah dodaj komentar na vrh liste
+                this.commentPage = 0;
+                this.loadComments();
+                this.commentControl.reset();
+            },
+            error: (err) => {
+                console.error('Greška pri kreiranju komentara', err);
+                alert('Greška pri dodavanju komentara. Pokušajte ponovo.');
+            }
+        });
+    }
+
+    deleteComment(commentId: number): void {
+        if (!confirm('Da li ste sigurni da želite da obrišete ovaj komentar?')) {
+            return;
+        }
+
+        this.commentService.deleteComment(commentId).subscribe({
+            next: () => {
+                this.comments = this.comments.filter(c => c.id !== commentId);
+            },
+            error: (err) => {
+                console.error('Greška pri brisanju komentara', err);
+                alert('Greška pri brisanju komentara. Pokušajte ponovo.');
+            }
+        });
+    }
+
+    loadMoreComments(): void {
+        if (this.commentPage < this.totalCommentPages - 1 && !this.loadingComments) {
+            this.commentPage++;
+            this.loadComments();
+        }
+    }
+
+    getTimeAgo(createdAt: Date): string {
+        const date = new Date(createdAt);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / (1000 * 60));
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffMins < 1) return 'Upravo sad';
+        if (diffMins < 60) return `Pre ${diffMins} min`;
+        if (diffHours < 24) return `Pre ${diffHours} h`;
+        if (diffDays < 7) return `Pre ${diffDays} dana`;
+        return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'numeric', year: 'numeric' });
+    }
+
+    canDeleteComment(comment: Comment): boolean {
+        if (!this.isLoggedIn) return false;
+        const token = this.authService.getToken();
+        if (!token) return false;
+        
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const userEmail = payload.sub;
+            return comment.authorEmail === userEmail;
+        } catch {
+            return false;
+        }
+    }
 }
+
