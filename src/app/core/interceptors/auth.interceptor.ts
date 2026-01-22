@@ -27,12 +27,14 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         // Ako je 401, token je istekao ili je nevažeći
-        // ALI ne izloguj korisnika ako je greška sa login/register endpointa
+        // ALI ne izloguj korisnika ako je greška sa login/register/profile/video-posts endpointa
         if (error.status === 401) {
           const isAuthEndpoint = error.url?.includes('/auth/login') || 
-                                 error.url?.includes('/auth/register');
+                                 error.url?.includes('/auth/register') ||
+                                 error.url?.includes('/users/') && error.url?.includes('/profile') ||
+                                 error.url?.includes('/video-posts/user/');
           
-          // Samo izloguj ako NIJE auth endpoint (znači da je token istekao)
+          // Samo izloguj ako NIJE auth ili profile endpoint (znači da je token istekao)
           if (!isAuthEndpoint && token) {
             this.authService.logout();
           }

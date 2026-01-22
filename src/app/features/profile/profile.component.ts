@@ -17,6 +17,10 @@ export class ProfileComponent implements OnInit {
   loading = true;
   error: string | null = null;
   videos: VideoResponseDTO[] = [];
+  page: number = 0;
+  pageSize: number = 12;
+  loadingVideos: boolean = false;
+  hasMore: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -34,7 +38,14 @@ export class ProfileComponent implements OnInit {
           this.loadUserVideos();
         },
         error: (err) => {
-          this.error = 'Greška pri učitavanju profila.';
+          console.error('Error loading user profile:', err);
+          if (err.status === 404) {
+            this.error = `Korisnik "${this.username}" ne postoji.`;
+          } else if (err.status === 401 || err.status === 403) {
+            this.error = 'Nemate dozvolu za pristup ovom profilu.';
+          } else {
+            this.error = 'Greška pri učitavanju profila.';
+          }
           this.loading = false;
         }
       });
@@ -42,20 +53,44 @@ export class ProfileComponent implements OnInit {
       this.error = 'Nepoznat korisnik.';
       this.loading = false;
     }
+    this.setupScrollListener();
+  }
+
+  setupScrollListener(): void {
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+
+      if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+        this.loadUserVideos();
+      }
+    });
   }
 
   loadUserVideos(): void {
-    if (this.username) {
-      // Dohvatamo sve videe i filtriramo po username-u
-      this.videoPostService.getAllVideoPosts(0).subscribe({
-        next: (allVideos) => {
-          this.videos = allVideos.filter(v => v.authorUsername === this.username);
-        },
-        error: (err) => {
-          console.error('Greška pri učitavanju videa', err);
+    if (!this.username || this.loadingVideos || !this.hasMore) return;
+
+    this.loadingVideos = true;
+    this.videoPostService.getUserVideoPosts(this.username, this.page, this.pageSize).subscribe({
+      next: (videos) => {
+        if (videos.length === 0) {
+          this.hasMore = false;
+        } else {
+          this.videos = [...this.videos, ...videos];
+          this.page++;
         }
-      });
-    }
+        this.loadingVideos = false;
+      },
+      error: (err) => {
+        console.error('Greška pri učitavanju videa', err);
+        // Ako je 401/403, ne pokušavaj više
+        if (err.status === 401 || err.status === 403) {
+          this.hasMore = false;
+        }
+        this.loadingVideos = false;
+      }
+    });
   }
 
   getThumbnailUrl(draftId: String): String {

@@ -89,16 +89,9 @@
     margin-right: 5px;
 }
 
-.channel a {
+.channel .author-name {
   color: #3cd9a7;
-  text-decoration: none;
   font-weight: 600;
-  transition: color 0.2s;
-}
-
-.channel a:hover {
-  color: #2ab88a;
-  text-decoration: underline;
 }
 
 .watch-metadata-controls {
@@ -511,4 +504,47 @@ video {
 
 .load-more-btn:hover {
 	background-color: #e5e7eb;
+}
+
+/* Loading and End Message for Suggested Videos */
+.loading-suggested {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	gap: 12px;
+}
+
+.loading-suggested .loading-spinner {
+	width: 40px;
+	height: 40px;
+	border: 3px solid #f3f3f3;
+	border-top: 3px solid #3cd9a7;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+.loading-suggested p {
+	font-size: 14px;
+	color: #666;
+	margin: 0;
+}
+
+.suggested-section .end-message {
+	text-align: center;
+	padding: 20px;
+	color: #888;
+	font-size: 14px;
+	border-top: 1px solid #e0e0e0;
+	margin-top: 10px;
+}
+
+.suggested-section .end-message p {
+	margin: 0;
 }

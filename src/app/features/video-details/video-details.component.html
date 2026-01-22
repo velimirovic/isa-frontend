@@ -13,9 +13,9 @@
             <div class="watch-metadata">
                 <span class="channel">
                     <mat-icon>person</mat-icon>
-                    <a *ngIf="videoDetails?.authorUsername" [routerLink]="['/profile', videoDetails!.authorUsername]">
+                    <span *ngIf="videoDetails?.authorUsername" class="author-name">
                       {{videoDetails?.authorUsername}}
-                    </a>
+                    </span>
                 </span>
 
                 <span class="watch-metadata-controls">
@@ -77,9 +77,9 @@
                     <div class="comment-header">
                         <span class="comment-author">
                             <mat-icon>account_circle</mat-icon>
-                            <a [routerLink]="['/profile', comment.authorUsername]">
+                            <span class="author-name">
                                 {{ comment.authorUsername }}
-                            </a>
+                            </span>
                         </span>
                         <span class="comment-time">{{ getTimeAgo(comment.createdAt) }}</span>
                     </div>
@@ -128,6 +128,17 @@
                     </p>
                 </div>
             </a>
+        </div>
+
+        <!-- Loading indicator -->
+        <div class="loading-suggested" *ngIf="loadingSuggested">
+            <div class="loading-spinner"></div>
+            <p>Učitavanje...</p>
+        </div>
+
+        <!-- End message -->
+        <div class="end-message" *ngIf="!hasMoreSuggested && suggestedVideos.length > 0">
+            <p>Prikazani su svi preporučeni videi</p>
         </div>
     </div>
 </div>

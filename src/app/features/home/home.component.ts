@@ -23,6 +23,9 @@ export class HomeComponent implements OnInit {
   isLoggedIn: boolean = false;
   private authSubscription?: Subscription;
   page: number = 0;
+  pageSize: number = 12; // 3 reda po 4 videa
+  loading: boolean = false;
+  hasMore: boolean = true;
     
   videos: VideoResponseDTO[] = [];
 
@@ -34,16 +37,40 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadVideos();
+    this.setupScrollListener();
   }
 
   loadVideos(): void {
-    this.videoPostService.getAllVideoPosts(this.page).subscribe({
+    if (this.loading || !this.hasMore) return;
+
+    this.loading = true;
+    this.videoPostService.getAllVideoPosts(this.page, this.pageSize).subscribe({
         next: (videos) => {
-        this.videos = videos;
+          if (videos.length === 0) {
+            this.hasMore = false;
+          } else {
+            this.videos = [...this.videos, ...videos];
+            this.page++;
+          }
+          this.loading = false;
         },
         error: (err) => {
-        console.error('Greška pri učitavanju videa', err);
+          console.error('Greška pri učitavanju videa', err);
+          this.loading = false;
         }
+    });
+  }
+
+  setupScrollListener(): void {
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+
+      // Ako je korisnik skrolovao do 80% stranice, učitaj još
+      if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+        this.loadVideos();
+      }
     });
   }
 
