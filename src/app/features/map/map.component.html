@@ -1,0 +1,15 @@
+<div class="map-page-container">
+    <div class="map-header">
+        <h1>Mapa Videa</h1>
+        <p *ngIf="!loading">Prikazano {{ videos.length }} videa sa lokacijom</p>
+        <p *ngIf="loading">Učitavanje...</p>
+    </div>
+    
+    <div class="map-wrapper">
+        <div id="map-view" class="leaflet-map-view"></div>
+    </div>
+
+    <div class="map-info" *ngIf="!loading && videos.length === 0">
+        <p>Trenutno nema videa sa lokacijom.</p>
+    </div>
+</div>

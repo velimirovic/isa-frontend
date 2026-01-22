@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { CommentService } from 'src/app/core/services/comment.service';
 import { Comment } from 'src/app/core/models/comment.model';
 import { FormControl, Validators } from '@angular/forms';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 
 @Component({
   selector: 'app-video-details',
@@ -21,6 +22,7 @@ export class VideoDetailsComponent {
         private router: Router,
         private authService: AuthService,
         private commentService: CommentService,
+        private modalService: ModalService
     ) {}
     draftId : string | null = null;
     videoDetails : VideoResponseDTO | null = null;
@@ -44,7 +46,7 @@ export class VideoDetailsComponent {
 
     handleLike(): void {
         if (!this.isLoggedIn) {
-            alert('Morate biti prijavljeni da biste lajkovali!');
+            this.modalService.show('Morate biti prijavljeni da biste lajkovali!', 'Prijava potrebna');
             return;
         }
         
@@ -57,7 +59,7 @@ export class VideoDetailsComponent {
             },
             error: (err) => {
                 console.error('Greška pri lajkovanju', err);
-                alert('Greška pri lajkovanju. Pokušajte ponovo.');
+                this.modalService.show('Greška pri lajkovanju. Pokušajte ponovo.', 'Greška');
             }
         });
     }
@@ -181,7 +183,7 @@ export class VideoDetailsComponent {
 
     submitComment(): void {
         if (!this.isLoggedIn) {
-            alert('Morate biti prijavljeni da biste komentarisali!');
+            this.modalService.show('Morate biti prijavljeni da biste komentarisali!', 'Prijava potrebna');
             return;
         }
 
@@ -202,13 +204,18 @@ export class VideoDetailsComponent {
             },
             error: (err) => {
                 console.error('Greška pri kreiranju komentara', err);
-                alert('Greška pri dodavanju komentara. Pokušajte ponovo.');
+                this.modalService.show('Greška pri dodavanju komentara. Pokušajte ponovo.', 'Greška');
             }
         });
     }
 
-    deleteComment(commentId: number): void {
-        if (!confirm('Da li ste sigurni da želite da obrišete ovaj komentar?')) {
+    async deleteComment(commentId: number): Promise<void> {
+        const confirmed = await this.modalService.confirm(
+            'Da li ste sigurni da želite da obrišete ovaj komentar?',
+            'Brisanje komentara'
+        );
+        
+        if (!confirmed) {
             return;
         }
 
@@ -218,7 +225,7 @@ export class VideoDetailsComponent {
             },
             error: (err) => {
                 console.error('Greška pri brisanju komentara', err);
-                alert('Greška pri brisanju komentara. Pokušajte ponovo.');
+                this.modalService.show('Greška pri brisanju komentara. Pokušajte ponovo.', 'Greška');
             }
         });
     }

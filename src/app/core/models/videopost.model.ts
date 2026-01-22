@@ -18,6 +18,8 @@ export interface VideoResponseDTO {
     tagNames: String[];
     likeCount?: number;
     likedByUser?: boolean;
+    latitude?: number;
+    longitude?: number;
 }
 
 export interface VideoPostDraftDTO {
@@ -26,4 +28,6 @@ export interface VideoPostDraftDTO {
     title: String
     description: String;
     draftId: String;
+    latitude?: number;
+    longitude?: number;
 }

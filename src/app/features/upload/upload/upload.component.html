@@ -1,6 +1,7 @@
 <div class="upload-container">
     <div class="upload-form">
         <form [formGroup]="form" (ngSubmit)="handleUpload()">        
+            <!-- Red 1: Video (levo) i Thumbnail (desno) -->
             <div class="drag-drop-area" 
                 [class.dragging]="isDraggingVideo"
                 (dragover)="onDragOverVideo($event)"
@@ -39,27 +40,31 @@
                 <div class="error-message" *ngIf="thumbnailError">{{ thumbnailError }}</div>
             </div>
 
-            <div *ngIf="uploadProgress > 0 && uploadProgress < 100">
+            <div *ngIf="uploadProgress > 0 && uploadProgress < 100" class="full-width">
                 <progress [value]="uploadProgress" max="100"></progress>
                 <span>{{ uploadProgress }}%</span>
             </div>
 
-            <div>
-                <label for="title">Naslov:</label>
-                <input type="text" id="title" name="title" formControlName="title" maxlength="100" />
-                <div class="error-message" *ngIf="title?.touched && title?.invalid">
-                    <span *ngIf="title?.errors?.['required']">Naslov je obavezan.</span>
-                    <span *ngIf="title?.errors?.['maxlength']">Naslov je predugačak.</span>
+            <!-- Red 2: Naslov i Opis (levo), Tagovi (desno) -->
+            <div class="left-column">
+                <div>
+                    <label for="title">Naslov:</label>
+                    <input type="text" id="title" name="title" formControlName="title" maxlength="100" />
+                    <div class="error-message" *ngIf="title?.touched && title?.invalid">
+                        <span *ngIf="title?.errors?.['required']">Naslov je obavezan.</span>
+                        <span *ngIf="title?.errors?.['maxlength']">Naslov je predugačak.</span>
+                    </div>
+                </div>
+                <div>
+                    <label for="description">Opis:</label>
+                    <textarea id="description" name="description" formControlName="description" rows="4" maxlength="2000"></textarea>
+                    <div class="error-message" *ngIf="description?.touched && description?.invalid">
+                        <span *ngIf="description?.errors?.['required']">Opis je obavezan.</span>
+                        <span *ngIf="description?.errors?.['maxlength']">Opis je predugačak.</span>
+                    </div>
                 </div>
             </div>
-            <div>
-                <label for="description">Opis:</label>
-                <textarea id="description" name="description" formControlName="description" rows="4" maxlength="2000"></textarea>
-                <div class="error-message" *ngIf="description?.touched && description?.invalid">
-                    <span *ngIf="description?.errors?.['required']">Opis je obavezan.</span>
-                    <span *ngIf="description?.errors?.['maxlength']">Opis je predugačak.</span>
-                </div>
-            </div>
+
             <div class="tags-section">
                 <label for="tags">Tagovi:</label>
                 <input
@@ -90,6 +95,31 @@
                     {{ tagsError }}
                 </div>
             </div>
+
+            <div class="location-section full-width">
+                <label class="location-toggle">
+                    <input type="checkbox" [(ngModel)]="addLocation" [ngModelOptions]="{standalone: true}" (change)="onLocationToggle()">
+                    <span>Dodaj lokaciju videa</span>
+                </label>
+
+                <div class="location-container" *ngIf="addLocation">
+                    <div class="location-controls">
+                        <button type="button" class="use-location-btn" (click)="useMyLocation()">
+                            📍 Koristi moju lokaciju
+                        </button>
+                        <span class="location-hint">Ili klikni na mapu</span>
+                    </div>
+
+                    <div class="map-wrapper">
+                        <div id="map" class="leaflet-map"></div>
+                    </div>
+
+                    <div class="selected-coordinates" *ngIf="selectedLatitude !== null && selectedLongitude !== null">
+                        <span>Izabrana lokacija: {{ selectedLatitude | number:'1.4-4' }}, {{ selectedLongitude | number:'1.4-4' }}</span>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit">Otpremi</button>
         </form>
     </div>

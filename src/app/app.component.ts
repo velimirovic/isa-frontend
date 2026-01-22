@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from './core/services/auth.service';
 import { Subscription } from 'rxjs';
+import { ModalService } from './shared/modal/modal.service';
 
 @Component({
   selector: 'app-root',
@@ -15,12 +16,18 @@ export class AppComponent implements OnInit, OnDestroy {
 
 
   constructor (
-    private authService: AuthService
+    private authService: AuthService,
+    private modalService: ModalService
   ) {}
 
-  logout(): void {
-    if (confirm('Da li ste sigurni da želite da se odjavite?')) {
-    this.authService.logout();
+  async logout(): Promise<void> {
+    const confirmed = await this.modalService.confirm(
+      'Da li ste sigurni da želite da se odjavite?',
+      'Odjava'
+    );
+    
+    if (confirmed) {
+      this.authService.logout();
     }
   }
 

@@ -9,6 +9,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { UploadComponent } from './features/upload/upload/upload.component';
 import { VideoDetailsComponent } from './features/video-details/video-details.component';
 import { ProfileComponent } from './features/profile/profile.component';
+import { MapComponent } from './features/map/map.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -17,7 +18,8 @@ const routes: Routes = [
   { path: 'activate', component: ActivateComponent },
   { path: 'check-email', component: CheckEmailComponent },
   { path: 'home', redirectTo: '', pathMatch: 'full' },
-  { path: 'upload', component: UploadComponent},
+  { path: 'upload', component: UploadComponent, canActivate: [AuthGuard] },
+  { path: 'map', component: MapComponent, canActivate: [AuthGuard] },
   { path: 'watch/:id', component: VideoDetailsComponent },
   { path: 'profile/:username', component: ProfileComponent },
   { path: '**', redirectTo: '' },

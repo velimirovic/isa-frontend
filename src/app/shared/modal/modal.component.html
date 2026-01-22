@@ -1,0 +1,32 @@
+<div class="modal-overlay" *ngIf="modalService.isVisible$ | async" (click)="closeModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>{{ (modalService.title$ | async) || 'Obaveštenje' }}</h3>
+            <button class="modal-close" (click)="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <p>{{ modalService.message$ | async }}</p>
+        </div>
+        <div class="modal-footer">
+            <!-- Prikazi dugme Otkaži samo za confirm dijalog -->
+            <button 
+                *ngIf="modalService.isConfirm$ | async" 
+                class="modal-btn modal-btn-secondary" 
+                (click)="onCancel()">
+                Otkaži
+            </button>
+            <button 
+                *ngIf="!(modalService.isConfirm$ | async)"
+                class="modal-btn modal-btn-primary" 
+                (click)="closeModal()">
+                U redu
+            </button>
+            <button 
+                *ngIf="modalService.isConfirm$ | async"
+                class="modal-btn modal-btn-primary" 
+                (click)="onConfirm()">
+                Potvrdi
+            </button>
+        </div>
+    </div>
+</div>
