@@ -43,6 +43,17 @@
           </div>
         </a>
       </div>
+
+      <!-- Loading indicator -->
+      <div class="loading-container" *ngIf="loadingVideos">
+        <div class="loading-spinner"></div>
+        <p>Učitavanje video snimaka...</p>
+      </div>
+
+      <!-- End message -->
+      <div class="end-message" *ngIf="!hasMore && videos.length > 0">
+        <p>Prikazani su svi video snimci korisnika</p>
+      </div>
     </div>
   </div>
 </div>

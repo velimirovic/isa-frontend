@@ -28,6 +28,10 @@ export class VideoDetailsComponent {
     videoDetails : VideoResponseDTO | null = null;
     videoTags: string[] = [];
     suggestedVideos: VideoResponseDTO[] = [];
+    suggestedPage: number = 0;
+    suggestedPageSize: number = 12;
+    loadingSuggested: boolean = false;
+    hasMoreSuggested: boolean = true;
     comments: Comment[] = [];
     commentPage: number = 0;
     commentPageSize: number = 10;
@@ -70,9 +74,30 @@ export class VideoDetailsComponent {
 			const id = params.get('id');
 			if (id) {
 				this.draftId = id;
+				this.resetSuggestedVideos();
 				this.loadVideoAndSuggestions(id);
 			}
 		});
+		this.setupScrollListener();
+    }
+
+    setupScrollListener(): void {
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = document.documentElement.clientHeight;
+
+            // Ako je korisnik skrolovao do 80% stranice, učitaj još
+            if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+                this.loadMoreSuggestedVideos();
+            }
+        });
+    }
+
+    resetSuggestedVideos(): void {
+        this.suggestedVideos = [];
+        this.suggestedPage = 0;
+        this.hasMoreSuggested = true;
     }
 
     private async getVideoDetails(draftId : string) : Promise<VideoResponseDTO> {
@@ -124,16 +149,30 @@ export class VideoDetailsComponent {
     }
 
     private loadSuggestedVideos(): void {
-        this.videoPostService.getAllVideoPosts(0).subscribe({
+        if (this.loadingSuggested || !this.hasMoreSuggested) return;
+
+        this.loadingSuggested = true;
+        this.videoPostService.getAllVideoPosts(this.suggestedPage, this.suggestedPageSize).subscribe({
             next: (videos) => {
-                this.suggestedVideos = videos
-                    .filter(v => v.draftId !== this.draftId)
-                    .slice(0, 6);
+                const filtered = videos.filter(v => v.draftId !== this.draftId);
+                
+                if (filtered.length === 0) {
+                    this.hasMoreSuggested = false;
+                } else {
+                    this.suggestedVideos = [...this.suggestedVideos, ...filtered];
+                    this.suggestedPage++;
+                }
+                this.loadingSuggested = false;
             },
             error: (err) => {
                 console.error('Error loading suggested videos', err);
+                this.loadingSuggested = false;
             }
         });
+    }
+
+    loadMoreSuggestedVideos(): void {
+        this.loadSuggestedVideos();
     }
 
     getThumbnailUrl(draftId: String): String {

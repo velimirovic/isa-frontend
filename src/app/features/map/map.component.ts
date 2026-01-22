@@ -13,6 +13,8 @@ export class MapComponent implements OnInit, OnDestroy {
     private map: L.Map | null = null;
     videos: VideoResponseDTO[] = [];
     loading = true;
+    private markers: L.Marker[] = [];
+    private updateTimeout: any;
 
     constructor(
         private videoPostService: VideoPostService,
@@ -20,44 +22,97 @@ export class MapComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.loadVideosWithLocation();
         this.initMap();
     }
 
     ngOnDestroy(): void {
+        if (this.updateTimeout) {
+            clearTimeout(this.updateTimeout);
+        }
         if (this.map) {
             this.map.remove();
             this.map = null;
         }
     }
 
-    private async loadVideosWithLocation(): Promise<void> {
+    private async loadVideosForCurrentView(): Promise<void> {
+        if (!this.map) return;
+
         try {
             this.loading = true;
-            // Učitaj sve videe koristeći Observable
-            this.videoPostService.getAllVideoPosts(0).subscribe({
-                next: (allVideos: VideoResponseDTO[]) => {
-                    // Filtriraj samo videe koji imaju validne koordinate (ne null i ne 0,0)
-                    this.videos = allVideos.filter((v: VideoResponseDTO) => 
-                        v.latitude != null && 
-                        v.longitude != null && 
-                        (v.latitude !== 0 || v.longitude !== 0)
-                    );
-                    this.loading = false;
-                    // Ako je mapa već inicijalizovana, dodaj markere
-                    if (this.map) {
-                        this.addVideoMarkers();
-                    }
-                },
-                error: (error: any) => {
-                    console.error('Greška pri učitavanju videa:', error);
-                    this.loading = false;
-                }
-            });
+            
+            // Dobavi trenutne tile bounds
+            const tileBounds = this.getTileBounds();
+            
+            // Učitaj videe za trenutne tiles
+            const videos = await this.videoPostService.getVideosByTiles(
+                tileBounds.zoom,
+                tileBounds.minTileX,
+                tileBounds.maxTileX,
+                tileBounds.minTileY,
+                tileBounds.maxTileY
+            );
+
+            this.videos = videos;
+            this.loading = false;
+            
+            // Ukloni stare markere
+            this.clearMarkers();
+            
+            // Dodaj nove markere
+            this.addVideoMarkers();
+            
         } catch (error) {
             console.error('Greška pri učitavanju videa:', error);
             this.loading = false;
         }
+    }
+
+    private getTileBounds(): { zoom: number, minTileX: number, maxTileX: number, minTileY: number, maxTileY: number } {
+        if (!this.map) {
+            return { zoom: 5, minTileX: 0, maxTileX: 0, minTileY: 0, maxTileY: 0 };
+        }
+
+        const bounds = this.map.getBounds();
+        const zoom = this.map.getZoom();
+
+        // Pretvori geografske koordinate u tile koordinate
+        const minTileX = this.lonToTileX(bounds.getWest(), zoom);
+        const maxTileX = this.lonToTileX(bounds.getEast(), zoom);
+        const minTileY = this.latToTileY(bounds.getNorth(), zoom);
+        const maxTileY = this.latToTileY(bounds.getSouth(), zoom);
+
+        return {
+            zoom: Math.floor(zoom),
+            minTileX: Math.floor(minTileX),
+            maxTileX: Math.floor(maxTileX),
+            minTileY: Math.floor(minTileY),
+            maxTileY: Math.floor(maxTileY)
+        };
+    }
+
+    private lonToTileX(lon: number, zoom: number): number {
+        return ((lon + 180) / 360) * Math.pow(2, zoom);
+    }
+
+    private latToTileY(lat: number, zoom: number): number {
+        return ((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2) * Math.pow(2, zoom);
+    }
+
+    private clearMarkers(): void {
+        this.markers.forEach(marker => marker.remove());
+        this.markers = [];
+    }
+
+    private onMapMoveEnd(): void {
+        // Debounce - čekaj 300ms pre nego što učitaš nove videe
+        if (this.updateTimeout) {
+            clearTimeout(this.updateTimeout);
+        }
+        
+        this.updateTimeout = setTimeout(() => {
+            this.loadVideosForCurrentView();
+        }, 300);
     }
 
     private initMap(): void {
@@ -70,8 +125,12 @@ export class MapComponent implements OnInit, OnDestroy {
             maxZoom: 19,
         }).addTo(this.map);
 
-        // Dodaj markere za svaki video
-        this.addVideoMarkers();
+        // Event listeneri za promene na mapi
+        this.map.on('moveend', () => this.onMapMoveEnd());
+        this.map.on('zoomend', () => this.onMapMoveEnd());
+
+        // Učitaj videe za početni pogled
+        this.loadVideosForCurrentView();
     }
 
     private addVideoMarkers(): void {
@@ -91,6 +150,9 @@ export class MapComponent implements OnInit, OnDestroy {
             if (video.latitude != null && video.longitude != null && this.map) {
                 const marker = L.marker([video.latitude, video.longitude], { icon })
                     .addTo(this.map);
+
+                // Dodaj marker u listu za kasniju cleanup
+                this.markers.push(marker);
 
                 // URL za thumbnail
                 const thumbnailUrl = this.videoPostService.getThumbnailUrl(video.thumbnailPath);
@@ -128,10 +190,5 @@ export class MapComponent implements OnInit, OnDestroy {
                 marker.bindPopup(popupContent);
             }
         });
-
-        // Ako ima videa, centri mapu na prvi video
-        if (this.videos.length > 0 && this.videos[0].latitude && this.videos[0].longitude) {
-            this.map.setView([this.videos[0].latitude, this.videos[0].longitude], 6);
-        }
     }
 }

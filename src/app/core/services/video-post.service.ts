@@ -25,9 +25,12 @@ export class VideoPostService {
         private authService: AuthService,
     ) {}
 
-    getAllVideoPosts(page: number) : Observable<VideoResponseDTO[]> {
+    getAllVideoPosts(page: number, pageSize: number = 12) : Observable<VideoResponseDTO[]> {
         return this.http.get<VideoResponseDTO[]>(this.baseUrl, { 
-            params: { page: page } 
+            params: { 
+                page: page.toString(),
+                size: pageSize.toString()
+            } 
         });
     }
 
@@ -36,8 +39,26 @@ export class VideoPostService {
         return lastValueFrom(request$);
     }
 
-    getUserVideoPosts(username: string): Observable<VideoResponseDTO[]> {
-        return this.http.get<VideoResponseDTO[]>(`${this.baseUrl}/user/${username}`);
+    async getVideosByTiles(zoom: number, minTileX: number, maxTileX: number, minTileY: number, maxTileY: number): Promise<VideoResponseDTO[]> {
+        const request$ = this.http.get<VideoResponseDTO[]>(environment.apiHost + 'map/tiles', {
+            params: {
+                zoom: zoom.toString(),
+                minTileX: minTileX.toString(),
+                maxTileX: maxTileX.toString(),
+                minTileY: minTileY.toString(),
+                maxTileY: maxTileY.toString()
+            }
+        });
+        return lastValueFrom(request$);
+    }
+
+    getUserVideoPosts(username: string, page: number = 0, pageSize: number = 12): Observable<VideoResponseDTO[]> {
+        return this.http.get<VideoResponseDTO[]>(`${this.baseUrl}/user/${username}`, {
+            params: {
+                page: page.toString(),
+                size: pageSize.toString()
+            }
+        });
     }
 
     getThumbnailUrl(path: String): String {
