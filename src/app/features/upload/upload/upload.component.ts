@@ -9,6 +9,8 @@ import { VideoPostService } from 'src/app/core/services/video-post.service';
 import { environment } from 'src/env/environment';
 import { VideoResponseDTO } from 'src/app/core/models/videopost.model';
 import { Router } from '@angular/router';
+import * as L from 'leaflet';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 
 @Component({
     selector: 'app-upload',
@@ -43,10 +45,18 @@ export class UploadComponent implements OnInit, OnDestroy {
     tags: string[] = [];
     tagsError = '';
 
+    // Location state
+    addLocation = false;
+    selectedLatitude: number | null = null;
+    selectedLongitude: number | null = null;
+    private map: L.Map | null = null;
+    private marker: L.Marker | null = null;
+
     constructor(
         private fb: FormBuilder,
         private videoPostService: VideoPostService,
         private router : Router,
+        private modalService: ModalService
     ) {
         this.form = this.fb.group({
             title: ['', [Validators.required, Validators.maxLength(100)]],
@@ -157,7 +167,14 @@ export class UploadComponent implements OnInit, OnDestroy {
             console.log(this.title.value);
             console.log(this.description.value);
 
-            res = await this.videoPostService.uploadPostDetails(this.title.value, this.description.value, this.tags, this.draftId);
+            res = await this.videoPostService.uploadPostDetails(
+                this.title.value, 
+                this.description.value, 
+                this.tags, 
+                this.draftId,
+                this.selectedLatitude,
+                this.selectedLongitude
+            );
         }
         
         if (res.match("success") && this.draftId) 
@@ -259,6 +276,10 @@ export class UploadComponent implements OnInit, OnDestroy {
         if (this.thumbnailPreviewUrl) {
             URL.revokeObjectURL(this.thumbnailPreviewUrl);
         }
+        if (this.map) {
+            this.map.remove();
+            this.map = null;
+        }
     }
 
     ngOnInit(): void {
@@ -294,5 +315,107 @@ export class UploadComponent implements OnInit, OnDestroy {
                 this.form.patchValue(patch);
             }
         }
+    }
+
+    onLocationToggle(): void {
+        if (this.addLocation) {
+            setTimeout(() => this.initMap(), 100);
+        } else {
+            this.selectedLatitude = null;
+            this.selectedLongitude = null;
+            if (this.map) {
+                this.map.remove();
+                this.map = null;
+            }
+            this.marker = null;
+        }
+    }
+
+    private initMap(): void {
+        if (this.map) {
+            return;
+        }
+
+        // Inicijalizuj mapu centriranu na Evropu
+        this.map = L.map('map').setView([48.8566, 2.3522], 5);
+
+        // Dodaj tile layer (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19,
+        }).addTo(this.map);
+
+        // Dodaj ikonu za marker
+        const icon = L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        // Omogući klik na mapu
+        this.map.on('click', (e: L.LeafletMouseEvent) => {
+            this.setMarker(e.latlng.lat, e.latlng.lng, icon);
+        });
+
+        // Ako postoje već izabrane koordinate, postavi marker
+        if (this.selectedLatitude !== null && this.selectedLongitude !== null) {
+            this.setMarker(this.selectedLatitude, this.selectedLongitude, icon);
+        }
+    }
+
+    private setMarker(lat: number, lng: number, icon: L.Icon): void {
+        if (!this.map) {
+            return;
+        }
+
+        // Ukloni prethodni marker
+        if (this.marker) {
+            this.marker.remove();
+        }
+
+        // Dodaj novi marker
+        this.marker = L.marker([lat, lng], { icon }).addTo(this.map);
+
+        // Ažuriraj koordinate
+        this.selectedLatitude = lat;
+        this.selectedLongitude = lng;
+    }
+
+    useMyLocation(): void {
+        if (!navigator.geolocation) {
+            this.modalService.show('Tvoj pretraživač ne podržava geolokaciju.', 'Geolokacija nije podržana');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                if (this.map) {
+                    this.map.setView([lat, lng], 13);
+
+                    const icon = L.icon({
+                        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+                        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+                        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    });
+
+                    this.setMarker(lat, lng, icon);
+                }
+            },
+            (error) => {
+                console.error('Greška pri dobijanju lokacije:', error);
+                this.modalService.show('Nije moguće dobiti tvoju lokaciju. Proveri dozvole pretraživača.', 'Greška');
+            }
+        );
     }
 }

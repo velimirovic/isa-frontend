@@ -31,6 +31,11 @@ export class VideoPostService {
         });
     }
 
+    async getAllVideos(): Promise<VideoResponseDTO[]> {
+        const request$ = this.http.get<VideoResponseDTO[]>(this.baseUrl + '/all');
+        return lastValueFrom(request$);
+    }
+
     getUserVideoPosts(username: string): Observable<VideoResponseDTO[]> {
         return this.http.get<VideoResponseDTO[]>(`${this.baseUrl}/user/${username}`);
     }
@@ -93,15 +98,21 @@ export class VideoPostService {
         return lastValueFrom(request$);
     }
 
-    async uploadPostDetails(title: string, description: string, tags: string[], draftId : string) : Promise<string> {
-        // const formData = new FormData();
-        // formData.append('title', title);
-        // formData.append('description', description);
-        // tags.forEach(tag => {
-        //     formData.append('tags', tag);
-        // });
-
-        const body = { title, description, tags};
+    async uploadPostDetails(
+        title: string, 
+        description: string, 
+        tags: string[], 
+        draftId: string,
+        latitude: number | null = null,
+        longitude: number | null = null
+    ): Promise<string> {
+        const body: any = { title, description, tags };
+        
+        // Dodaj latitude i longitude samo ako su postavljeni
+        if (latitude !== null && longitude !== null) {
+            body.latitude = latitude;
+            body.longitude = longitude;
+        }
         
         const request$ = this.http.patch(
             this.baseUrl + '/' + draftId,

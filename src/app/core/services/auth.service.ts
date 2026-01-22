@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { ModalService } from '../../shared/modal/modal.service';
 
 export interface RegisterRequest {
   email: string;
@@ -36,7 +37,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private modalService: ModalService
   ) {
     // Proveri token pri inicijalizaciji
     this.checkTokenExpiration();
@@ -104,7 +106,7 @@ export class AuthService {
     setInterval(() => {
       if (!this.hasValidToken() && this.isAuthenticatedSubject.value) {
         this.logout();
-        alert('Vaša sesija je istekla. Molimo prijavite se ponovo.');
+        this.modalService.show('Vaša sesija je istekla. Molimo prijavite se ponovo.', 'Sesija istekla');
       }
     }, 60000); // Proveri svaki minut
   }
@@ -114,8 +116,13 @@ export class AuthService {
     const warningTime = expiresIn - (5 * 60 * 1000);
     
     if (warningTime > 0) {
-      setTimeout(() => {
-        if (confirm('Vaša sesija uskoro ističe. Želite li da ostanete prijavljeni?')) {
+      setTimeout(async () => {
+        const confirmed = await this.modalService.confirm(
+          'Vaša sesija uskoro ističe. Želite li da ostanete prijavljeni?',
+          'Sesija ističe'
+        );
+        
+        if (confirmed) {
           // Korisnik može da se ponovo uloguje
           this.router.navigate(['/login']);
         }

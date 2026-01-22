@@ -1,7 +1,9 @@
 <div class="video-details-container">
     <div class="watch-comment-section">
         <div class='watch-section'>
-            <video [src]="videoDetails?.videoPath" controls width="100%"></video>
+            <div class="video-container">
+                <video [src]="videoDetails?.videoPath" controls></video>
+            </div>
 
             <h1 class="video-title">{{videoDetails?.title}}</h1>
 
