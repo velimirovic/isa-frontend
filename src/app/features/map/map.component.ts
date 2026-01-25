@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MapTileService, MapTileVideo } from 'src/app/core/services/map-tile.service';
+import { VideoPostService } from 'src/app/core/services/video-post.service';
 import { Router } from '@angular/router';
 import * as L from 'leaflet';
 
@@ -17,6 +18,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     constructor(
         private mapTileService: MapTileService,
+        private videoPostService: VideoPostService,
         private router: Router
     ) {}
 
@@ -39,6 +41,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this.loading = true;
         // Dobavi trenutne tile bounds
         const tileBounds = this.getTileBounds();
+        console.log('Tile params:', tileBounds);
         // Učitaj videe za trenutne tiles
         this.mapTileService.getVideosForTiles(
             tileBounds.zoom,
@@ -48,6 +51,7 @@ export class MapComponent implements OnInit, OnDestroy {
             tileBounds.maxTileY
         ).subscribe({
             next: (videos) => {
+                console.log('Broj videa:', videos.length);
                 this.videos = videos;
                 this.loading = false;
                 this.clearMarkers();
@@ -147,7 +151,7 @@ export class MapComponent implements OnInit, OnDestroy {
                 this.markers.push(marker);
 
                 // URL za thumbnail
-                const thumbnailUrl = video.thumbnailPath;
+                const thumbnailUrl = this.videoPostService.getThumbnailUrl(video.thumbnailPath);
 
                 // Kreiraj popup sa informacijama o videu
                 const popupContent = `

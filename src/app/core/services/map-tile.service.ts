@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/env/environment';
 
 export interface MapTileVideo {
   id: number;
@@ -31,7 +32,7 @@ export class MapTileService {
       .set('minTileY', minTileY)
       .set('maxTileY', maxTileY);
     return this.http.get<MapTileVideo[]>(
-      '/api/map/tiles',
+      environment.apiHost + 'map/tiles',
       { params }
     );
   }
