@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MapTileService, MapTileVideo } from 'src/app/core/services/map-tile.service';
 import { VideoPostService } from 'src/app/core/services/video-post.service';
-import { VideoResponseDTO } from 'src/app/core/models/videopost.model';
 import { Router } from '@angular/router';
 import * as L from 'leaflet';
 
@@ -11,12 +11,13 @@ import * as L from 'leaflet';
 })
 export class MapComponent implements OnInit, OnDestroy {
     private map: L.Map | null = null;
-    videos: VideoResponseDTO[] = [];
+    videos: MapTileVideo[] = [];
     loading = true;
     private markers: L.Marker[] = [];
     private updateTimeout: any;
 
     constructor(
+        private mapTileService: MapTileService,
         private videoPostService: VideoPostService,
         private router: Router
     ) {}
@@ -35,37 +36,32 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    private async loadVideosForCurrentView(): Promise<void> {
+    private loadVideosForCurrentView(): void {
         if (!this.map) return;
-
-        try {
-            this.loading = true;
-            
-            // Dobavi trenutne tile bounds
-            const tileBounds = this.getTileBounds();
-            
-            // Učitaj videe za trenutne tiles
-            const videos = await this.videoPostService.getVideosByTiles(
-                tileBounds.zoom,
-                tileBounds.minTileX,
-                tileBounds.maxTileX,
-                tileBounds.minTileY,
-                tileBounds.maxTileY
-            );
-
-            this.videos = videos;
-            this.loading = false;
-            
-            // Ukloni stare markere
-            this.clearMarkers();
-            
-            // Dodaj nove markere
-            this.addVideoMarkers();
-            
-        } catch (error) {
-            console.error('Greška pri učitavanju videa:', error);
-            this.loading = false;
-        }
+        this.loading = true;
+        // Dobavi trenutne tile bounds
+        const tileBounds = this.getTileBounds();
+        console.log('Tile params:', tileBounds);
+        // Učitaj videe za trenutne tiles
+        this.mapTileService.getVideosForTiles(
+            tileBounds.zoom,
+            tileBounds.minTileX,
+            tileBounds.maxTileX,
+            tileBounds.minTileY,
+            tileBounds.maxTileY
+        ).subscribe({
+            next: (videos) => {
+                console.log('Broj videa:', videos.length);
+                this.videos = videos;
+                this.loading = false;
+                this.clearMarkers();
+                this.addVideoMarkers();
+            },
+            error: (error) => {
+                console.error('Greška pri učitavanju videa:', error);
+                this.loading = false;
+            }
+        });
     }
 
     private getTileBounds(): { zoom: number, minTileX: number, maxTileX: number, minTileY: number, maxTileY: number } {

@@ -39,18 +39,6 @@ export class VideoPostService {
         return lastValueFrom(request$);
     }
 
-    async getVideosByTiles(zoom: number, minTileX: number, maxTileX: number, minTileY: number, maxTileY: number): Promise<VideoResponseDTO[]> {
-        const request$ = this.http.get<VideoResponseDTO[]>(environment.apiHost + 'map/tiles', {
-            params: {
-                zoom: zoom.toString(),
-                minTileX: minTileX.toString(),
-                maxTileX: maxTileX.toString(),
-                minTileY: minTileY.toString(),
-                maxTileY: maxTileY.toString()
-            }
-        });
-        return lastValueFrom(request$);
-    }
 
     getUserVideoPosts(username: string, page: number = 0, pageSize: number = 12): Observable<VideoResponseDTO[]> {
         return this.http.get<VideoResponseDTO[]>(`${this.baseUrl}/user/${username}`, {
