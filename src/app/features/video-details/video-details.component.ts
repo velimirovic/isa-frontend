@@ -78,20 +78,6 @@ export class VideoDetailsComponent {
 				this.loadVideoAndSuggestions(id);
 			}
 		});
-		this.setupScrollListener();
-    }
-
-    setupScrollListener(): void {
-        window.addEventListener('scroll', () => {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const scrollHeight = document.documentElement.scrollHeight;
-            const clientHeight = document.documentElement.clientHeight;
-
-            // Ako je korisnik skrolovao do 80% stranice, učitaj još
-            if (scrollTop + clientHeight >= scrollHeight * 0.8) {
-                this.loadMoreSuggestedVideos();
-            }
-        });
     }
 
     resetSuggestedVideos(): void {

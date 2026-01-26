@@ -17,10 +17,17 @@
           <h3 class="video-title">{{ video.title }}</h3>
         <p class="video-meta">
           {{ video.viewCount }} pregleda • {{ getDaysAgo(video.createdAt) }}<br>
-          <span class="author-name">{{ video.authorUsername }}</span>
+          <a [routerLink]="['/profile', video.authorUsername]">{{ video.authorUsername }}</a>
         </p>
         </div>
        </a>
+    </div>
+
+    <!-- Load More Button -->
+    <div class="load-more-container" *ngIf="hasMore && !loading">
+      <button class="load-more-btn" (click)="loadVideos()">
+        Prikaži još videa
+      </button>
     </div>
 
     <!-- Loading indicator -->

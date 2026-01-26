@@ -89,9 +89,16 @@
     margin-right: 5px;
 }
 
-.channel .author-name {
+.channel a {
   color: #3cd9a7;
+  text-decoration: none;
   font-weight: 600;
+  transition: color 0.2s;
+}
+
+.channel a:hover {
+  color: #2ab88a;
+  text-decoration: underline;
 }
 
 .watch-metadata-controls {
@@ -547,4 +554,34 @@ video {
 
 .suggested-section .end-message p {
 	margin: 0;
+}
+
+/* Load More Button for Suggested Videos */
+.load-more-suggested-container {
+	display: flex;
+	justify-content: center;
+	padding: 20px;
+}
+
+.load-more-suggested-container .load-more-btn {
+	background-color: #3cd9a7;
+	color: white;
+	border: none;
+	padding: 10px 24px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 8px rgba(60, 217, 167, 0.3);
+}
+
+.load-more-suggested-container .load-more-btn:hover {
+	background-color: #2ab88a;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(60, 217, 167, 0.4);
+}
+
+.load-more-suggested-container .load-more-btn:active {
+	transform: translateY(0);
 }
