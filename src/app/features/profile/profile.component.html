@@ -44,6 +44,13 @@
         </a>
       </div>
 
+      <!-- Load More Button -->
+      <div class="load-more-container" *ngIf="hasMore && !loadingVideos">
+        <button class="load-more-btn" (click)="loadUserVideos()">
+          Prikaži još videa
+        </button>
+      </div>
+
       <!-- Loading indicator -->
       <div class="loading-container" *ngIf="loadingVideos">
         <div class="loading-spinner"></div>

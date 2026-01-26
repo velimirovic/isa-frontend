@@ -21,6 +21,7 @@ const routes: Routes = [
   { path: 'upload', component: UploadComponent, canActivate: [AuthGuard] },
   { path: 'map', component: MapComponent, canActivate: [AuthGuard] },
   { path: 'watch/:id', component: VideoDetailsComponent },
+  { path: 'profile/:username', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' },
 ];
 
