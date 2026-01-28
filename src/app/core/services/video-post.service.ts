@@ -5,6 +5,7 @@ import { Observable, lastValueFrom } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { AuthService } from "./auth.service";
 import { Subscription } from "rxjs";
+import { FilterType } from "../models/filter-type.enum";
 
 export interface LikeResponseDTO {
     likeCount: number;
@@ -25,11 +26,12 @@ export class VideoPostService {
         private authService: AuthService,
     ) {}
 
-    getAllVideoPosts(page: number, pageSize: number = 12) : Observable<VideoResponseDTO[]> {
+    getAllVideoPosts(page: number, pageSize: number = 3, filter: FilterType) : Observable<VideoResponseDTO[]> {
         return this.http.get<VideoResponseDTO[]>(this.baseUrl, { 
             params: { 
                 page: page.toString(),
-                size: pageSize.toString()
+                size: pageSize.toString(),
+                filter: filter
             } 
         });
     }

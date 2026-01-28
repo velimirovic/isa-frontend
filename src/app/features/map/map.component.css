@@ -2,6 +2,9 @@
     padding: 24px 32px;
     background-color: #f5f5f7;
     min-height: calc(100vh - 60px);
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .map-header {
@@ -10,6 +13,8 @@
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .map-header h1 {
@@ -67,4 +72,50 @@
 
 :host ::ng-deep .leaflet-popup button:hover {
     background: #2ab88a !important;
+}
+
+/* Period filter (UI only) */
+.period-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e6e6e6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.period-filter input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.period-filter label {
+  user-select: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.period-filter label:hover {
+  background: rgba(60, 217, 167, 0.10);
+  color: #2ab88a;
+}
+
+.period-filter input:focus-visible + label {
+  outline: 2px solid rgba(60, 217, 167, 0.55);
+  outline-offset: 2px;
+}
+
+.period-filter input:checked + label {
+  background: #3cd9a7;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(60, 217, 167, 0.35);
 }

@@ -1,10 +1,23 @@
 <div class="home-container">
   <!-- Main Content -->
   <main class="main-content">
-    <h2 class="section-title">Video snimci</h2>
+    <div class="home-header">
+      <h2 class="section-title">Video snimci</h2>
+
+      <div class="period-filter" role="group" aria-label="Filter po vremenskom periodu">
+        <input type="radio" name="period" id="period-all" value="allTime" checked (change)="setFilter(FilterType.ALL_TIME)">
+        <label for="period-all">Sve vreme</label>
+
+        <input type="radio" name="period" id="period-30" value="last30days" (change)="setFilter(FilterType.LAST_30_DAYS)">
+        <label for="period-30">Poslednjih 30 dana</label>
+
+        <input type="radio" name="period" id="period-year" value="currentYear" (change)="setFilter(FilterType.CURRENT_YEAR)">
+        <label for="period-year">Tekuća godina</label>
+      </div>
+    </div>
+    
     
     <div class="videos-grid">
-      <!-- Video placeholders -->
        <a [routerLink]="['/watch', video.draftId]" class="video-card" *ngFor="let video of videos">
         <div class="video-thumbnail">
           <img

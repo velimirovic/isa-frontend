@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { UserService } from 'src/app/core/services/user.service';
 import { VideoPostService } from 'src/app/core/services/video-post.service';
 import { VideoResponseDTO } from 'src/app/core/models/videopost.model';
+import { FilterType } from 'src/app/core/models/filter-type.enum';
 
 interface Video {
   id: number;
@@ -26,6 +27,8 @@ export class HomeComponent implements OnInit {
   pageSize: number = 12; // 3 reda po 4 videa
   loading: boolean = false;
   hasMore: boolean = true;
+  selectedPeriod: 'all' | '30d' | 'year' = 'all';
+  FilterType = FilterType;
     
   videos: VideoResponseDTO[] = [];
 
@@ -39,11 +42,11 @@ export class HomeComponent implements OnInit {
     this.loadVideos();
   }
 
-  loadVideos(): void {
+  loadVideos(filter: FilterType = FilterType.ALL_TIME): void {
     if (this.loading || !this.hasMore) return;
 
     this.loading = true;
-    this.videoPostService.getAllVideoPosts(this.page, this.pageSize).subscribe({
+    this.videoPostService.getAllVideoPosts(this.page, this.pageSize, filter).subscribe({
         next: (videos) => {
           if (videos.length === 0) {
             this.hasMore = false;
@@ -85,5 +88,12 @@ export class HomeComponent implements OnInit {
 
     getThumbnailUrl(draftId: String): String {
         return this.imageBaseUrl + "api/video-posts/" + draftId + "/thumbnail";
+    }
+
+    setFilter(filter: FilterType): void {
+        this.page = 0;
+        this.hasMore = true;
+        this.videos = [];
+        this.loadVideos(filter);
     }
 }
