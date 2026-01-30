@@ -9,6 +9,7 @@ import { CommentService } from 'src/app/core/services/comment.service';
 import { Comment } from 'src/app/core/models/comment.model';
 import { FormControl, Validators } from '@angular/forms';
 import { ModalService } from 'src/app/shared/modal/modal.service';
+import { FilterType } from 'src/app/core/models/filter-type.enum';
 
 @Component({
   selector: 'app-video-details',
@@ -138,7 +139,7 @@ export class VideoDetailsComponent {
         if (this.loadingSuggested || !this.hasMoreSuggested) return;
 
         this.loadingSuggested = true;
-        this.videoPostService.getAllVideoPosts(this.suggestedPage, this.suggestedPageSize).subscribe({
+        this.videoPostService.getAllVideoPosts(this.suggestedPage, this.suggestedPageSize, FilterType.ALL_TIME).subscribe({
             next: (videos) => {
                 const filtered = videos.filter(v => v.draftId !== this.draftId);
                 

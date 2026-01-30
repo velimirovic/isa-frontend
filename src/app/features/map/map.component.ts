@@ -3,6 +3,7 @@ import { MapTileService, MapTileVideo } from 'src/app/core/services/map-tile.ser
 import { VideoPostService } from 'src/app/core/services/video-post.service';
 import { Router } from '@angular/router';
 import * as L from 'leaflet';
+import { FilterType } from 'src/app/core/models/filter-type.enum';
 
 @Component({
     selector: 'app-map',
@@ -15,6 +16,8 @@ export class MapComponent implements OnInit, OnDestroy {
     loading = true;
     private markers: L.Marker[] = [];
     private updateTimeout: any;
+    FilterType = FilterType;
+    currentFilter: FilterType = FilterType.ALL_TIME;
 
     constructor(
         private mapTileService: MapTileService,
@@ -36,7 +39,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
     }
 
-    private loadVideosForCurrentView(): void {
+    private loadVideosForCurrentView(filter: FilterType = FilterType.ALL_TIME): void {
         if (!this.map) return;
         this.loading = true;
         // Dobavi trenutne tile bounds
@@ -48,7 +51,8 @@ export class MapComponent implements OnInit, OnDestroy {
             tileBounds.minTileX,
             tileBounds.maxTileX,
             tileBounds.minTileY,
-            tileBounds.maxTileY
+            tileBounds.maxTileY,
+            filter
         ).subscribe({
             next: (videos) => {
                 console.log('Broj videa:', videos.length);
@@ -62,6 +66,12 @@ export class MapComponent implements OnInit, OnDestroy {
                 this.loading = false;
             }
         });
+    }
+
+    setFilter(filter: FilterType): void {
+        this.videos = [];
+        this.currentFilter = filter;
+        this.loadVideosForCurrentView(this.currentFilter);
     }
 
     private getTileBounds(): { zoom: number, minTileX: number, maxTileX: number, minTileY: number, maxTileY: number } {
@@ -107,7 +117,7 @@ export class MapComponent implements OnInit, OnDestroy {
         }
         
         this.updateTimeout = setTimeout(() => {
-            this.loadVideosForCurrentView();
+            this.loadVideosForCurrentView(this.currentFilter);
         }, 300);
     }
 
@@ -126,7 +136,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this.map.on('zoomend', () => this.onMapMoveEnd());
 
         // Učitaj videe za početni pogled
-        this.loadVideosForCurrentView();
+        this.loadVideosForCurrentView(this.currentFilter);
     }
 
     private addVideoMarkers(): void {
