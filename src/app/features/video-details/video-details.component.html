@@ -2,7 +2,40 @@
     <div class="watch-comment-section">
         <div class='watch-section'>
             <div class="video-container">
-                <video [src]="videoDetails?.videoPath" controls></video>
+                <video 
+                    [src]="videoDetails?.videoPath" 
+                    [attr.controls]="isSynchronizedPlaybackActive ? null : true"
+                    (loadedmetadata)="onVideoLoadedMetadata()">
+                </video>
+                
+                <!-- Countdown overlay for scheduled videos -->
+                <div class="countdown-overlay" *ngIf="countdownMessage">
+                    <div class="countdown-content">
+                        <mat-icon>schedule</mat-icon>
+                        <h2>Zakazan video - Sinhronizovani prikaz</h2>
+                        <div class="scheduled-time">
+                            <p class="start-label">Počinje:</p>
+                            <p class="start-datetime">{{ getFormattedScheduledTime() }}</p>
+                        </div>
+                        <div class="countdown-timer">
+                            <p class="countdown-label">Preostalo vreme:</p>
+                            <p class="countdown-value">{{ countdownMessage }}</p>
+                        </div>
+                        <p class="countdown-hint">Video će automatski početi u zakazano vreme. Svi korisnici će gledati istu minutažu tokom trajanja videa. Nakon završetka, video postaje dostupan za normalan pregled sa kontrolama.</p>
+                    </div>
+                </div>
+                
+                <!-- Info badge for scheduled videos that have started -->
+                <div class="scheduled-badge" *ngIf="isSynchronizedPlaybackActive && !countdownMessage">
+                    <mat-icon>live_tv</mat-icon>
+                    <span>UŽIVO - Sinhronizovani prikaz</span>
+                </div>
+                
+                <!-- Info message below video during synchronized playback -->
+                <div class="sync-info-message" *ngIf="isSynchronizedPlaybackActive && !countdownMessage">
+                    <mat-icon>info</mat-icon>
+                    <p>Ovaj video se trenutno prikazuje u sinhronizovanom režimu. Kontrole će biti dostupne nakon završetka prikaza.</p>
+                </div>
             </div>
 
             <h1 class="video-title">{{videoDetails?.title}}</h1>

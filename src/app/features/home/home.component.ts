@@ -80,7 +80,7 @@ export class HomeComponent implements OnInit {
     } else if (diffDays < 7) {
       return "Pre " + diffDays + " dana";
     } else {
-      return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'numeric', year: 'numeric' });
+      return date.toLocaleDateString('sr-Latn-RS', { day: 'numeric', month: 'numeric', year: 'numeric' });
     }
   }
 
@@ -95,5 +95,61 @@ export class HomeComponent implements OnInit {
         this.hasMore = true;
         this.videos = [];
         this.loadVideos(filter);
+    }
+
+    isScheduled(video: VideoResponseDTO): boolean {
+        if (!video.scheduledDateTime) return false;
+        const scheduled = new Date(video.scheduledDateTime);
+        const now = new Date();
+        
+        const isScheduledForFuture = now < scheduled;
+        
+        if (isScheduledForFuture) {
+            console.log('[BADGE] Zakazano:', video.title, 
+                       '| Scheduled:', scheduled.toLocaleString('sr-Latn-RS'), 
+                       '| Now:', now.toLocaleString('sr-Latn-RS'));
+        }
+        
+        return isScheduledForFuture;
+    }
+
+    isLiveNow(video: VideoResponseDTO): boolean {
+        if (!video.scheduledDateTime) return false;
+        
+        const scheduled = new Date(video.scheduledDateTime);
+        const now = new Date();
+        
+        // Video hasn't started yet
+        if (now < scheduled) return false;
+        
+        // If duration is not set, assume a default duration of 3 hours (10800 seconds)
+        // This is for backward compatibility with videos uploaded before duration tracking
+        const durationSeconds = video.durationSeconds || 10800;
+        
+        // Calculate elapsed seconds since scheduled time
+        const elapsedSeconds = (now.getTime() - scheduled.getTime()) / 1000;
+        
+        const isCurrentlyLive = elapsedSeconds < durationSeconds;
+        
+        if (isCurrentlyLive) {
+            console.log('[BADGE] UŽIVO:', video.title, 
+                       '| Started:', scheduled.toLocaleString('sr-Latn-RS'),
+                       '| Elapsed:', Math.floor(elapsedSeconds), 's',
+                       '| Duration:', durationSeconds, 's');
+        }
+        
+        return isCurrentlyLive;
+    }
+
+    getScheduledDateTime(video: VideoResponseDTO): string {
+        if (!video.scheduledDateTime) return '';
+        const date = new Date(video.scheduledDateTime);
+        const dateStr = date.toLocaleDateString('sr-Latn-RS', { 
+            day: 'numeric', 
+            month: 'long',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        return dateStr;
     }
 }

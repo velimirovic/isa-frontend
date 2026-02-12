@@ -120,6 +120,40 @@
                 </div>
             </div>
 
+            <div class="scheduling-section full-width">
+                <label class="scheduling-toggle">
+                    <input type="checkbox" [(ngModel)]="enableScheduling" [ngModelOptions]="{standalone: true}">
+                    <span>Zakaži prikaz videa (sinhronizovani streaming)</span>
+                </label>
+
+                <div class="scheduling-inputs" *ngIf="enableScheduling">
+                    <div class="scheduling-input-group">
+                        <label for="scheduledDate">Datum:</label>
+                        <input 
+                            type="date" 
+                            id="scheduledDate" 
+                            [(ngModel)]="scheduledDate" 
+                            [ngModelOptions]="{standalone: true}"
+                            required>
+                    </div>
+                    
+                    <div class="scheduling-input-group">
+                        <label for="scheduledTime">Vreme:</label>
+                        <input 
+                            type="time" 
+                            id="scheduledTime" 
+                            [(ngModel)]="scheduledTime" 
+                            [ngModelOptions]="{standalone: true}"
+                            required>
+                    </div>
+                    
+                    <p class="scheduling-hint">
+                        Video će biti dostupan svim korisnicima u zakazano vreme sa sinhronizovanim prikazom. 
+                        Svi korisnici će gledati istu minutažu u isto vreme.
+                    </p>
+                </div>
+            </div>
+
             <button type="submit">Otpremi</button>
         </form>
     </div>

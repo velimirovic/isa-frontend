@@ -45,6 +45,16 @@ export class VideoDetailsComponent {
     likeCount: number = 0;
     likedByUser: boolean = false;
     
+    // Scheduled streaming
+    isScheduledVideo: boolean = false;
+    scheduledDateTime: Date | null = null;
+    countdownMessage: string | null = null;
+    videoElement: HTMLVideoElement | null = null;
+    syncInterval: any = null;
+    isInitializing: boolean = false;
+    isSynchronizedPlaybackActive: boolean = false;
+    videoDuration: number = 0;
+    
     get isLoggedIn(): boolean {
         return this.authService.isLoggedIn();
     }
@@ -81,6 +91,21 @@ export class VideoDetailsComponent {
 		});
     }
 
+    ngOnDestroy() {
+        // Clean up the sync interval when component is destroyed
+        if (this.syncInterval) {
+            clearInterval(this.syncInterval);
+            this.syncInterval = null;
+        }
+        
+        // Stop the video when leaving the page
+        if (this.videoElement) {
+            this.videoElement.pause();
+            this.videoElement.currentTime = 0;
+            this.videoElement = null;
+        }
+    }
+
     resetSuggestedVideos(): void {
         this.suggestedVideos = [];
         this.suggestedPage = 0;
@@ -98,6 +123,15 @@ export class VideoDetailsComponent {
         this.commentPage = 0;
         this.likeCount = 0;
         this.likedByUser = false;
+        this.isScheduledVideo = false;
+        this.scheduledDateTime = null;
+        this.countdownMessage = null;
+        
+        // Clear any existing sync interval
+        if (this.syncInterval) {
+            clearInterval(this.syncInterval);
+            this.syncInterval = null;
+        }
 
         if (!id) {
             return;
@@ -106,8 +140,28 @@ export class VideoDetailsComponent {
         try {
             this.videoDetails = await this.getVideoDetails(id);
             if (this.videoDetails) {
+                console.log('=== VIDEO DETAILS LOADED ===');
+                console.log('scheduledDateTime:', this.videoDetails.scheduledDateTime);
+                console.log('Full video details:', this.videoDetails);
+                
                 this.videoDetails.videoPath = environment.mediaHost + this.videoDetails.videoPath;
                 this.videoTags = this.extractTags(this.videoDetails.tagNames as any);
+                
+                // Check if video is scheduled
+                if (this.videoDetails.scheduledDateTime) {
+                    this.isScheduledVideo = true;
+                    this.scheduledDateTime = new Date(this.videoDetails.scheduledDateTime);
+                    
+                    console.log('=== SCHEDULED VIDEO ===');
+                    console.log('Raw from backend:', this.videoDetails.scheduledDateTime);
+                    console.log('Parsed as Date:', this.scheduledDateTime);
+                    console.log('Display format:', this.scheduledDateTime.toLocaleString('sr-Latn-RS'));
+                    console.log('Current time:', new Date().toLocaleString('sr-Latn-RS'));
+                    
+                    // Don't initialize yet - wait for video metadata to load first
+                    // This will be triggered by onVideoLoadedMetadata()
+                }
+                
                 this.loadComments();
                 this.loadLikeStatus();
             }
@@ -275,7 +329,7 @@ export class VideoDetailsComponent {
         if (diffMins < 60) return `Pre ${diffMins} min`;
         if (diffHours < 24) return `Pre ${diffHours} h`;
         if (diffDays < 7) return `Pre ${diffDays} dana`;
-        return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'numeric', year: 'numeric' });
+        return date.toLocaleDateString('sr-Latn-RS', { day: 'numeric', month: 'numeric', year: 'numeric' });
     }
 
     canDeleteComment(comment: Comment): boolean {
@@ -290,6 +344,229 @@ export class VideoDetailsComponent {
         } catch {
             return false;
         }
+    }
+
+    private async initializeSynchronizedPlayback(): Promise<void> {
+        if (!this.draftId || this.isInitializing) {
+            return;
+        }
+
+        this.isInitializing = true;
+        
+        console.log('=== INITIALIZING SYNCHRONIZED PLAYBACK ===');
+        console.log('videoDuration:', this.videoDuration);
+
+        try {
+            // Get the video element
+            const videoElement = document.querySelector('video') as HTMLVideoElement;
+            if (!videoElement) {
+                console.error('Video element not found');
+                this.isInitializing = false;
+                return;
+            }
+
+            this.videoElement = videoElement;
+            
+            // Wait for duration if not available yet
+            if (!this.videoDuration || this.videoDuration === 0) {
+                console.log('Waiting for video duration...');
+                await new Promise<void>((resolve) => {
+                    const checkDuration = () => {
+                        if (videoElement.duration && videoElement.duration > 0) {
+                            this.videoDuration = videoElement.duration;
+                            console.log('Video duration loaded:', this.videoDuration);
+                            resolve();
+                        } else {
+                            setTimeout(checkDuration, 100);
+                        }
+                    };
+                    checkDuration();
+                });
+            }
+
+            // Disable controls initially for scheduled videos
+            this.videoElement.controls = false;
+
+            // Prevent user from pausing/seeking during synchronized playback
+            this.setupControlsProtection();
+
+            // Get playback offset from server
+            const offset = await this.videoPostService.getPlaybackOffset(this.draftId);
+            
+            console.log('=== PLAYBACK OFFSET ===');
+            console.log('Offset from server:', offset);
+            console.log('Video duration:', this.videoDuration);
+
+            if (offset < 0) {
+                // Video hasn't started yet - show countdown
+                console.log('Video not started yet, showing countdown');
+                this.videoElement.pause();
+                this.isSynchronizedPlaybackActive = true;
+                this.startCountdown(Math.abs(offset));
+            } else if (offset >= this.videoDuration) {
+                // Synchronized playback period is already over
+                console.log('Synchronized playback already finished');
+                this.isSynchronizedPlaybackActive = false;
+                this.videoElement.controls = true;
+                this.videoElement.currentTime = 0;
+            } else {
+                // Video is in synchronized playback mode
+                console.log('Video in synchronized mode, seeking to:', offset);
+                this.isSynchronizedPlaybackActive = true;
+                this.syncVideoPlayback(offset);
+                
+                // Start periodic sync every 10 seconds
+                this.syncInterval = setInterval(() => {
+                    this.syncWithServer();
+                }, 10000);
+            }
+        } catch (err) {
+            console.error('Error initializing synchronized playback:', err);
+        } finally {
+            this.isInitializing = false;
+        }
+    }
+
+    private startCountdown(secondsUntilStart: number): void {
+        const updateCountdown = () => {
+            if (secondsUntilStart <= 0) {
+                this.countdownMessage = null;
+                this.isSynchronizedPlaybackActive = true;
+                // Video is starting now, sync with server
+                this.syncWithServer();
+                
+                // Start periodic sync
+                this.syncInterval = setInterval(() => {
+                    this.syncWithServer();
+                }, 10000);
+            } else {
+                const hours = Math.floor(secondsUntilStart / 3600);
+                const minutes = Math.floor((secondsUntilStart % 3600) / 60);
+                const seconds = secondsUntilStart % 60;
+                
+                if (hours > 0) {
+                    this.countdownMessage = `${hours}h ${minutes}m ${seconds}s`;
+                } else if (minutes > 0) {
+                    this.countdownMessage = `${minutes}m ${seconds}s`;
+                } else {
+                    this.countdownMessage = `${seconds}s`;
+                }
+                
+                secondsUntilStart--;
+                setTimeout(updateCountdown, 1000);
+            }
+        };
+        
+        updateCountdown();
+    }
+
+    private async syncWithServer(): Promise<void> {
+        if (!this.draftId || !this.videoElement) return;
+
+        try {
+            const offset = await this.videoPostService.getPlaybackOffset(this.draftId);
+            
+            if (offset >= 0) {
+                // Check if synchronized playback period is over
+                if (this.videoDuration > 0 && offset >= this.videoDuration) {
+                    // Synchronized playback is finished, enable normal controls
+                    this.isSynchronizedPlaybackActive = false;
+                    this.videoElement.controls = true;
+                    this.videoElement.pause();
+                    this.videoElement.currentTime = 0;
+                    
+                    // Clear the sync interval
+                    if (this.syncInterval) {
+                        clearInterval(this.syncInterval);
+                        this.syncInterval = null;
+                    }
+                } else {
+                    // Still in synchronized mode
+                    this.syncVideoPlayback(offset);
+                }
+            }
+        } catch (err) {
+            console.error('Error syncing with server:', err);
+        }
+    }
+
+    private syncVideoPlayback(targetOffset: number): void {
+        if (!this.videoElement) return;
+
+        const currentTime = this.videoElement.currentTime;
+        const drift = Math.abs(currentTime - targetOffset);
+
+        // Only sync if drift is more than 2 seconds
+        if (drift > 2) {
+            console.log(`Syncing video: current=${currentTime}s, target=${targetOffset}s, drift=${drift}s`);
+            this.videoElement.currentTime = targetOffset;
+        }
+
+        // Ensure video is playing
+        if (this.videoElement.paused) {
+            this.videoElement.play().catch(err => {
+                console.error('Error playing video:', err);
+            });
+        }
+    }
+
+    onVideoLoadedMetadata(): void {
+        // Called when video metadata is loaded
+        const videoElement = document.querySelector('video') as HTMLVideoElement;
+        if (videoElement) {
+            this.videoDuration = videoElement.duration;
+            console.log('=== VIDEO METADATA LOADED ===');
+            console.log('Video duration:', this.videoDuration);
+        }
+        
+        // Initialize synchronized playback now that we have video metadata
+        if (this.isScheduledVideo && !this.isInitializing) {
+            console.log('Triggering synchronized playback initialization...');
+            this.initializeSynchronizedPlayback();
+        }
+    }
+
+    private setupControlsProtection(): void {
+        if (!this.videoElement) return;
+
+        // Prevent pause during synchronized playback
+        this.videoElement.addEventListener('pause', () => {
+            if (this.isSynchronizedPlaybackActive && this.videoElement) {
+                // Auto-resume if paused during sync
+                setTimeout(() => {
+                    if (this.videoElement && this.isSynchronizedPlaybackActive) {
+                        this.videoElement.play().catch(err => {
+                            console.error('Error resuming video:', err);
+                        });
+                    }
+                }, 100);
+            }
+        });
+
+        // Prevent seeking during synchronized playback
+        this.videoElement.addEventListener('seeking', () => {
+            if (this.isSynchronizedPlaybackActive && this.videoElement) {
+                // This will be corrected by the next sync cycle
+                console.log('Seeking blocked during synchronized playback');
+            }
+        });
+    }
+
+    getFormattedScheduledTime(): string {
+        if (!this.scheduledDateTime) return '';
+        
+        const date = new Date(this.scheduledDateTime);
+        const dateStr = date.toLocaleDateString('sr-Latn-RS', { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
+        });
+        const timeStr = date.toLocaleTimeString('sr-Latn-RS', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        
+        return `${dateStr} u ${timeStr}`;
     }
 }
 

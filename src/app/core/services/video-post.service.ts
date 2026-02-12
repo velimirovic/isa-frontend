@@ -115,7 +115,9 @@ export class VideoPostService {
         tags: string[], 
         draftId: string,
         latitude: number | null = null,
-        longitude: number | null = null
+        longitude: number | null = null,
+        scheduledDateTime: Date | null = null,
+        durationSeconds: number | null = null
     ): Promise<string> {
         const body: any = { title, description, tags };
         
@@ -124,6 +126,30 @@ export class VideoPostService {
             body.latitude = latitude;
             body.longitude = longitude;
         }
+        
+        // Dodaj scheduledDateTime samo ako je postavljen
+        if (scheduledDateTime !== null) {
+            // Format date as local time string in ISO format (without timezone)
+            const year = scheduledDateTime.getFullYear();
+            const month = String(scheduledDateTime.getMonth() + 1).padStart(2, '0');
+            const day = String(scheduledDateTime.getDate()).padStart(2, '0');
+            const hours = String(scheduledDateTime.getHours()).padStart(2, '0');
+            const minutes = String(scheduledDateTime.getMinutes()).padStart(2, '0');
+            const seconds = String(scheduledDateTime.getSeconds()).padStart(2, '0');
+            
+            body.scheduledDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+            console.log('=== VIDEO POST SERVICE ===');
+            console.log('Sending scheduledDateTime (local time):', body.scheduledDateTime);
+        }
+        
+        // Dodaj durationSeconds ako je postavljen
+        if (durationSeconds !== null) {
+            body.durationSeconds = durationSeconds;
+            console.log('Sending durationSeconds:', durationSeconds);
+        }
+        
+        console.log('=== UPLOAD POST DETAILS BODY ===');
+        console.log(JSON.stringify(body, null, 2));
         
         const request$ = this.http.patch(
             this.baseUrl + '/' + draftId,
@@ -164,5 +190,15 @@ export class VideoPostService {
         return this.http.get<LikeResponseDTO>(
             `${this.interactionsUrl}/videos/${videoId}/likes`
         );
+    }
+
+    async getPlaybackOffset(draftId: string): Promise<number> {
+        console.log('Fetching playback offset for draftId:', draftId);
+        const request$ = this.http.get<number>(
+            this.baseUrl + '/' + draftId + '/playback-offset'
+        );
+        const offset = await lastValueFrom(request$);
+        console.log('Playback offset received:', offset);
+        return offset;
     }
 }

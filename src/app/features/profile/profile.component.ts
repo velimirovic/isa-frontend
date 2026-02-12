@@ -100,7 +100,7 @@ export class ProfileComponent implements OnInit {
     } else if (diffDays < 7) {
       return 'Pre ' + diffDays + ' dana';
     } else {
-      return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'numeric', year: 'numeric' });
+      return date.toLocaleDateString('sr-Latn-RS', { day: 'numeric', month: 'numeric', year: 'numeric' });
     }
   }
 }
