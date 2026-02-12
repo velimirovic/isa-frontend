@@ -20,6 +20,8 @@ export interface VideoResponseDTO {
     likedByUser?: boolean;
     latitude?: number;
     longitude?: number;
+    scheduledDateTime?: Date;
+    durationSeconds?: number;
 }
 
 export interface VideoPostDraftDTO {

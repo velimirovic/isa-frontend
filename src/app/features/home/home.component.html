@@ -25,11 +25,29 @@
                 class="thumbnail-image"
                 [alt]="video.thumbnailPath"
             />
+          
+          <!-- Badge for scheduled videos -->
+          <div class="scheduled-badge-overlay" *ngIf="isScheduled(video)">
+            <span class="badge-icon">🕒</span>
+            <span class="badge-text">Zakazano</span>
+          </div>
+          
+          <!-- Badge for live videos -->
+          <div class="live-badge-overlay" *ngIf="isLiveNow(video) && !isScheduled(video)">
+            <span class="live-dot"></span>
+            <span class="badge-text">UŽIVO</span>
+          </div>
         </div>
         <div class="video-info">
           <h3 class="video-title">{{ video.title }}</h3>
         <p class="video-meta">
-          {{ video.viewCount }} pregleda • {{ getDaysAgo(video.createdAt) }}<br>
+          <span *ngIf="isScheduled(video)" class="scheduled-info">
+            📅 {{ getScheduledDateTime(video) }}
+          </span>
+          <span *ngIf="!isScheduled(video)">
+            {{ video.viewCount }} pregleda • {{ getDaysAgo(video.createdAt) }}
+          </span>
+          <br>
           <a [routerLink]="['/profile', video.authorUsername]">{{ video.authorUsername }}</a>
         </p>
         </div>

@@ -52,6 +52,14 @@ export class UploadComponent implements OnInit, OnDestroy {
     private map: L.Map | null = null;
     private marker: L.Marker | null = null;
 
+    // Scheduling state
+    enableScheduling = false;
+    scheduledDate: string | null = null;
+    scheduledTime: string | null = null;
+
+    // Video duration in seconds
+    videoDuration: number | null = null;
+
     constructor(
         private fb: FormBuilder,
         private videoPostService: VideoPostService,
@@ -160,6 +168,25 @@ export class UploadComponent implements OnInit, OnDestroy {
         formData.append('title', this.form.value.title);
         formData.append('description', this.form.value.description);
         
+        // Prepare scheduled datetime if enabled
+        let scheduledDateTime: Date | null = null;
+        if (this.enableScheduling && this.scheduledDate && this.scheduledTime) {
+            // User enters time in their local timezone
+            // Create Date object from local input
+            const dateTimeString = `${this.scheduledDate}T${this.scheduledTime}`;
+            scheduledDateTime = new Date(dateTimeString);
+            
+            console.log('=== SCHEDULING DEBUG ===');
+            console.log('User input - Date:', this.scheduledDate, 'Time:', this.scheduledTime);
+            console.log('Created local DateTime:', scheduledDateTime.toLocaleString('sr-Latn-RS'));
+            console.log('This will be sent to backend as:', 
+                       scheduledDateTime.getFullYear() + '-' + 
+                       String(scheduledDateTime.getMonth() + 1).padStart(2, '0') + '-' +
+                       String(scheduledDateTime.getDate()).padStart(2, '0') + 'T' +
+                       String(scheduledDateTime.getHours()).padStart(2, '0') + ':' +
+                       String(scheduledDateTime.getMinutes()).padStart(2, '0'));
+        }
+        
         var res = ""
         if (this.title && 
             this.description && 
@@ -173,7 +200,9 @@ export class UploadComponent implements OnInit, OnDestroy {
                 this.tags, 
                 this.draftId,
                 this.selectedLatitude,
-                this.selectedLongitude
+                this.selectedLongitude,
+                scheduledDateTime,
+                this.videoDuration ? Math.floor(this.videoDuration) : null
             );
         }
         
@@ -229,6 +258,9 @@ export class UploadComponent implements OnInit, OnDestroy {
             URL.revokeObjectURL(this.videoPreviewUrl);
         }
         this.videoPreviewUrl = URL.createObjectURL(file);
+
+        // Read video duration
+        this.readVideoDuration(file);
 
         if (!this.draftId) {
             //console.error('Draft ID is missing, cannot upload video');
@@ -417,5 +449,23 @@ export class UploadComponent implements OnInit, OnDestroy {
                 this.modalService.show('Nije moguće dobiti tvoju lokaciju. Proveri dozvole pretraživača.', 'Greška');
             }
         );
+    }
+
+    private readVideoDuration(file: File): void {
+        const videoElement = document.createElement('video');
+        videoElement.preload = 'metadata';
+        
+        videoElement.onloadedmetadata = () => {
+            window.URL.revokeObjectURL(videoElement.src);
+            this.videoDuration = videoElement.duration;
+            console.log('Video duration:', this.videoDuration, 'seconds');
+        };
+        
+        videoElement.onerror = () => {
+            console.error('Error loading video metadata');
+            window.URL.revokeObjectURL(videoElement.src);
+        };
+        
+        videoElement.src = URL.createObjectURL(file);
     }
 }
