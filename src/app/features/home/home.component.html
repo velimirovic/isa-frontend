@@ -1,6 +1,31 @@
 <div class="home-container">
   <!-- Main Content -->
   <main class="main-content">
+    <!-- Popular Videos Section -->
+    <div class="popular-section" *ngIf="popularVideos && popularVideos.length > 0">
+      <h2 class="section-title popular-title">⭐ Najpopularniji videi ove nedelje</h2>
+      <div class="popular-videos-grid">
+        <a [routerLink]="['/watch', video.draftId]" class="video-card popular-card" *ngFor="let video of popularVideos; let i = index">
+          <div class="video-thumbnail">
+            <div class="rank-badge">{{ i + 1 }}</div>
+            <img
+              [src]="getThumbnailUrl(video.draftId)"
+              class="thumbnail-image"
+              [alt]="video.thumbnailPath"
+            />
+          </div>
+          <div class="video-info">
+            <h3 class="video-title">{{ video.title }}</h3>
+            <p class="video-meta">
+              {{ video.viewCount }} pregleda • {{ getDaysAgo(video.createdAt) }}
+              <br>
+              <a [routerLink]="['/profile', video.authorUsername]">{{ video.authorUsername }}</a>
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+
     <div class="home-header">
       <h2 class="section-title">Video snimci</h2>
 

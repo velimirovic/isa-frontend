@@ -374,3 +374,69 @@
   color: #3b82f6;
   font-weight: 600;
 }
+
+/* Popular Videos Section */
+.popular-section {
+  margin-bottom: 48px;
+  padding: 24px;
+  background: linear-gradient(135deg, #4de0b3 0%, #28b185 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(60, 217, 167, 0.3);
+}
+
+.popular-title {
+  color: #ffffff !important;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.popular-videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.popular-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.popular-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.rank-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #333;
+  font-size: 24px;
+  font-weight: 900;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  border: 3px solid #ffffff;
+}
+
+@media (max-width: 768px) {
+  .popular-videos-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .popular-section {
+    padding: 16px;
+    margin-bottom: 32px;
+  }
+}
