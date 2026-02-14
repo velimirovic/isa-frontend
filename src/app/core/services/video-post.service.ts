@@ -201,4 +201,11 @@ export class VideoPostService {
         console.log('Playback offset received:', offset);
         return offset;
     }
+
+    /**
+     * Dobavlja top 3 najpopularnija videa iz poslednjeg ETL izvršavanja
+     */
+    getPopularVideos(): Observable<VideoResponseDTO[]> {
+        return this.http.get<VideoResponseDTO[]>(`${this.baseUrl}/popular`);
+    }
 }

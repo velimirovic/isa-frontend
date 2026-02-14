@@ -31,6 +31,7 @@ export class HomeComponent implements OnInit {
   FilterType = FilterType;
     
   videos: VideoResponseDTO[] = [];
+  popularVideos: VideoResponseDTO[] = []; // Top 3 popularna videa
 
   constructor(
     private authService: AuthService,
@@ -40,6 +41,19 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadVideos();
+    this.loadPopularVideos(); // Učitaj popularne videe
+  }
+
+  loadPopularVideos(): void {
+    this.videoPostService.getPopularVideos().subscribe({
+      next: (videos) => {
+        this.popularVideos = videos;
+        console.log('Učitano popularnih videa:', videos.length);
+      },
+      error: (err) => {
+        console.error('Greška pri učitavanju popularnih videa', err);
+      }
+    });
   }
 
   loadVideos(filter: FilterType = FilterType.ALL_TIME): void {
