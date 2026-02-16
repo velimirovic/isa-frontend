@@ -15,6 +15,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
 /* Logo */
@@ -24,6 +25,9 @@
   gap: 12px;
   cursor: pointer;
   transition: opacity 0.3s;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .logo:hover {
@@ -58,6 +62,9 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .user-section a {
@@ -72,6 +79,14 @@
   padding: 8px 16px;
   border-radius: 24px;
   backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 2;
+}
+
+button.user-info {
+  border: none;
+  cursor: pointer;
+  font: inherit;
 }
 
 .user-icon {

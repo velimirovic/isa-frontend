@@ -1,0 +1,58 @@
+<section class="stage">
+  <div class="content">
+    <div class="hero">
+      <h1>Watch Party sobe</h1>
+      <p>Pokrenite sobu, podelite link i otvorite isti video kod svih clanova cim host pusti video.</p>
+      <div class="hero-actions">
+        <button class="primary" (click)="createRoom()">Kreiraj sobu</button>
+        <button class="ghost" (click)="joinRoom()">Pridruzi se</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card create">
+        <h2>Kreiranje</h2>
+        <p class="muted">Samo prijavljeni korisnici mogu da kreiraju sobu.</p>
+        <button class="primary" (click)="createRoom()">Kreiraj sobu</button>
+        <div class="info">
+          <div class="row"><span>Kod sobe</span><strong>{{ roomCode || '—' }}</strong></div>
+          <div class="row"><span>Link</span><a [href]="shareLink" target="_blank">{{ shareLink || '—' }}</a></div>
+        </div>
+        <div class="actions">
+          <button class="ghost" (click)="copyLink()">Kopiraj link</button>
+        </div>
+      </div>
+
+      <div class="card join">
+        <h2>Pridruzivanje</h2>
+        <p class="muted">Unesite kod sobe i sacekajte da host pusti video.</p>
+        <label>Kod sobe
+          <input [(ngModel)]="joinCode" placeholder="A1B2C3D4" />
+        </label>
+        <button class="primary" (click)="joinRoom()">Pridruzi se</button>
+        <div class="status">{{ joinStatus }}</div>
+      </div>
+
+      <div class="card host">
+        <h2>Host kontrola</h2>
+        <p class="muted">Izaberite video i pustite ga svim clanovima sobe.</p>
+        <div class="video-list" *ngIf="userVideos.length > 0">
+          <button
+            class="video-item"
+            *ngFor="let video of userVideos"
+            [class.selected]="isSelected(video)"
+            (click)="useVideo(video)">
+            <div class="video-title">{{ video.title || 'Bez naziva' }}</div>
+            <div class="video-meta">{{ video.draftId }}</div>
+          </button>
+        </div>
+        <div class="status" *ngIf="userVideos.length === 0">
+          {{ videosStatus }}
+        </div>
+        <button class="primary" (click)="playVideo()">Pusti video</button>
+        <button class="ghost" (click)="closeRoom()">Zatvori sobu</button>
+        <div class="status">{{ hostStatus }}</div>
+      </div>
+    </div>
+  </div>
+</section>

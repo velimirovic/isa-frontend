@@ -10,6 +10,7 @@ import { UploadComponent } from './features/upload/upload/upload.component';
 import { VideoDetailsComponent } from './features/video-details/video-details.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { MapComponent } from './features/map/map.component';
+import { WatchPartyComponent } from './features/watch-party/watch-party.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -21,6 +22,8 @@ const routes: Routes = [
   { path: 'upload', component: UploadComponent, canActivate: [AuthGuard] },
   { path: 'map', component: MapComponent, canActivate: [AuthGuard] },
   { path: 'watch/:id', component: VideoDetailsComponent },
+  { path: 'watch-party', component: WatchPartyComponent },
+  { path: 'watch-party/:code', component: WatchPartyComponent },
   { path: 'profile/:username', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' },
 ];
