@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -10,12 +11,16 @@ export class NavbarComponent implements OnInit {
   @Input() username: string = '';
   @Output() logout = new EventEmitter<void>();  
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
   }
 
   onLogout(): void {
     this.logout.emit();
+  }
+
+  goWatchParty(): void {
+    this.router.navigate(['/watch-party']);
   }
 }

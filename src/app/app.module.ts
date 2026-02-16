@@ -19,6 +19,7 @@ import { VideoDetailsComponent } from './features/video-details/video-details.co
 import { ProfileComponent } from './features/profile/profile.component';
 import { MapComponent } from './features/map/map.component';
 import { ModalComponent } from './shared/modal/modal.component';
+import { WatchPartyComponent } from './features/watch-party/watch-party.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { ModalComponent } from './shared/modal/modal.component';
     VideoDetailsComponent,
     ProfileComponent,
     MapComponent,
-    ModalComponent
+    ModalComponent,
+    WatchPartyComponent
   ],
   imports: [
     BrowserModule,
