@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { VideoResponseDTO } from 'src/app/core/models/videopost.model';
 import { VideoPostService } from 'src/app/core/services/video-post.service';
@@ -6,24 +6,30 @@ import { environment } from 'src/env/environment';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CommentService } from 'src/app/core/services/comment.service';
+import { UserService } from 'src/app/core/services/user.service';
+import { VideoChatService } from 'src/app/core/services/video-chat.service';
+import { ChatMessage } from 'src/app/core/models/chat-message.model';
 import { Comment } from 'src/app/core/models/comment.model';
 import { FormControl, Validators } from '@angular/forms';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { FilterType } from 'src/app/core/models/filter-type.enum';
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-video-details',
   templateUrl: './video-details.component.html',
   styleUrls: ['./video-details.component.css']
 })
-export class VideoDetailsComponent {
+export class VideoDetailsComponent implements OnInit, OnDestroy {
     constructor(
         private route: ActivatedRoute,
         private videoPostService: VideoPostService,
         private router: Router,
         private authService: AuthService,
         private commentService: CommentService,
-        private modalService: ModalService
+        private modalService: ModalService,
+        private chatService: VideoChatService,
+        private userService: UserService
     ) {}
     draftId : string | null = null;
     videoDetails : VideoResponseDTO | null = null;
@@ -54,6 +60,11 @@ export class VideoDetailsComponent {
     isInitializing: boolean = false;
     isSynchronizedPlaybackActive: boolean = false;
     videoDuration: number = 0;
+
+    // Live chat
+    username: string = '';
+    messages: ChatMessage[] = [];
+    newMessage: string = '';
     
     get isLoggedIn(): boolean {
         return this.authService.isLoggedIn();
@@ -87,8 +98,50 @@ export class VideoDetailsComponent {
 				this.draftId = id;
 				this.resetSuggestedVideos();
 				this.loadVideoAndSuggestions(id);
-			}
+
+                // Subscribe to chat messages
+                this.chatService.messages$.subscribe((message: ChatMessage) => {
+                    this.messages.push(message);
+                });
+
+                // Load user and try to connect to chat after username is loaded
+                // this.userService.getCurrentUser().subscribe({
+                //     next: (user) => {
+                //         this.username = user.username;
+                //         // Try to connect to chat (will only work if video details are also loaded)
+                //         this.initializeChat();
+                //     },
+                //     error: (err) => {
+                //         console.error('Error loading current user', err);
+                //     }
+                // });
+                this.authService.isAuthenticated$.subscribe(
+                    isAuthenticated => {
+                        if (isAuthenticated) {
+                        const token = this.authService.getToken();
+                        if (token) {
+                            try {
+                            const payload = JSON.parse(atob(token.split('.')[1]));
+                            // Token sadrži sub (email), prikaži ga kao username
+                            this.username = payload.sub || '';
+                            } catch (e) {
+                            console.error('Error parsing token', e);
+                            }
+                        }
+                        } else {
+                        this.username = '';
+                        }
+                    }
+                );
+            }
 		});
+    }
+
+    sendMessage(): void {
+        if (this.newMessage.trim() && this.videoDetails && this.username) {
+            this.chatService.sendMessage(this.videoDetails.draftId.toString(), this.username, this.newMessage);
+            this.newMessage = '';
+        }
     }
 
     ngOnDestroy() {
@@ -103,6 +156,11 @@ export class VideoDetailsComponent {
             this.videoElement.pause();
             this.videoElement.currentTime = 0;
             this.videoElement = null;
+        }
+
+        // Disconnect from chat
+        if (this.videoDetails && this.username) {
+            this.chatService.disconnect(this.videoDetails.draftId.toString(), this.username);
         }
     }
 
@@ -164,10 +222,20 @@ export class VideoDetailsComponent {
                 
                 this.loadComments();
                 this.loadLikeStatus();
+                
+                // Connect to chat after video details are loaded
+                this.initializeChat();
             }
             this.loadSuggestedVideos();
         } catch (err) {
             console.error('Error loading video details', err);
+        }
+    }
+
+    private initializeChat(): void {
+        // Only connect if we have both username and video details
+        if (this.username && this.videoDetails) {
+            this.chatService.connectToVideoChat(this.videoDetails.draftId.toString(), this.username);
         }
     }
 
