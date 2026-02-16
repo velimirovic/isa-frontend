@@ -139,6 +139,29 @@
     </div>
     
     <div class="suggested-section">
+        <div class="chat-section" *ngIf="isSynchronizedPlaybackActive && !countdownMessage && isLoggedIn">
+            <h3>Chat ({{ username }})</h3>
+            
+            <div class="chat-messages">
+            <div *ngFor="let msg of messages" 
+                [class.own-message]="msg.username === username"
+                class="message">
+                <span class="username">{{ msg.username }}:</span>
+                <span class="text">{{ msg.message }}</span>
+                <span class="time">{{ msg.timestamp | date:'HH:mm' }}</span>
+            </div>
+            </div>
+
+            <div class="chat-input">
+            <input 
+                type="text" 
+                [(ngModel)]="newMessage"
+                (keyup.enter)="sendMessage()"
+                placeholder="Unesite poruku...">
+            <button (click)="sendMessage()">Pošalji</button>
+            </div>
+        </div>
+
         <h2>Preporučujemo</h2>
         <div class="suggested-videos">
             <a

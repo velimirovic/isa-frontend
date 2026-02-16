@@ -6,6 +6,7 @@
     "types": []
   },
   "files": [
+    "src/window-global-fix.ts",
     "src/main.ts"
   ],
   "include": [
